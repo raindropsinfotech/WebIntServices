@@ -1,0 +1,28 @@
+name: Deploy Laravel Project
+on:
+  push:
+    branches:
+      - master
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install NPM dependencies
+        run: npm install
+      - name: Compile CSS and Javascript assets
+        run: npm run build
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
+      - name: Create tar file first
+        run: touch build.tar.gz
+      - name: Archive our build
+        run: tar --exclude=build.tar.gz -czvf build.tar.gz .
+      - name: Deploy our build to DigitalOcean Droplet
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.DIGITAL_OCEAN_HOST }}
+          username: ${{ secrets.DIGITAL_OCEAN_USERNAME }}
+          password: ${{ secrets.DIGITAL_OCEAN_PASSWORD }}
+          source: ./build.tar.gz
+          target: /var/www/
