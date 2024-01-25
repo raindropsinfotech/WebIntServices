@@ -13,7 +13,7 @@ jobs:
       - name: Compile CSS and Javascript assets
         run: npm run build
       - name: Install Composer dependencies
-        run: composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
+        run: composer install --ignore-platform-reqs  --no-interaction --prefer-dist --optimize-autoloader --no-dev
       - name: Create tar file first
         run: touch build.tar.gz
       - name: Archive our build
