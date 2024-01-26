@@ -15,7 +15,7 @@ jobs:
       - name: Install Composer dependencies
         run: |
           composer config "http-basic.nova.laravel.com" "${{ secrets.NOVA_USER}}" "${{ secrets.NOVA_KEY}}"
-          composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
+          composer install --ignore-platform-reqs --no-interaction --prefer-dist --optimize-autoloader --no-dev
       - name: Create tar file first
         run: touch build.tar.gz
       - name: Archive our build
