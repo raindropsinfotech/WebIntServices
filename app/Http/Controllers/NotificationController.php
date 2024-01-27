@@ -15,9 +15,12 @@ class NotificationController extends Controller
                 'source' => 'required|string'
             ]);
 
+            $data = json_encode($request->json()->all());
+
+            // var_dump($data);
             $notification = new Notification();
             $notification->source = $request->input('source');
-            $notification->payload = $request->json()->all(); // Store the entire JSON request body
+            $notification->payload = $data; // Store the entire JSON request body
             $notification->save();
 
             return response()->json(['message' => 'Data saved successfully'], 201);
