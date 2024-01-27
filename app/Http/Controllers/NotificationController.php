@@ -11,7 +11,7 @@ class NotificationController extends Controller
     public function store(Request $request)
     {
         try {
-            $env_key = env('API_KEY');
+            $env_key = env('API_KEY', 'KZDjVDcpouleeir2bXovWSh4tv5RFK3y');
             $request->validate([
                 'source' => 'required|string',
                 'key' => 'required|string'
