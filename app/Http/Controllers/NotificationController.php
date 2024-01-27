@@ -11,9 +11,16 @@ class NotificationController extends Controller
     public function store(Request $request)
     {
         try {
+            $env_key = env('API_KEY');
             $request->validate([
-                'source' => 'required|string'
+                'source' => 'required|string',
+                'key' => 'required|string'
             ]);
+
+            $key = $request->input('key');
+
+            if ($key != $env_key)
+                return response()->json(['message' => 'Unauthorized request'], 401);
 
             $data = json_encode($request->json()->all());
 
