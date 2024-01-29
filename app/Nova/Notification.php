@@ -3,6 +3,7 @@
 namespace App\Nova;
 
 use Illuminate\Http\Request;
+use Laravel\Nova\Fields\Code;
 use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Fields\Markdown;
 use Laravel\Nova\Fields\Select;
@@ -46,7 +47,7 @@ class Notification extends Resource
         return [
             ID::make()->sortable(),
             Text::make('source'),
-            Markdown::make('payload'),
+            Code::make('payload'),
             Select::make('status')->options(['new' => 'new', 'processed_ok' => 'processed_ok', 'processed_error' => 'processed_error']),
             Markdown::make('result'),
 
