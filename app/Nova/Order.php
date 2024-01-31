@@ -3,22 +3,21 @@
 namespace App\Nova;
 
 use Illuminate\Http\Request;
-use Laravel\Nova\Fields\Code;
 use Laravel\Nova\Fields\ID;
-use Laravel\Nova\Fields\Markdown;
-use Laravel\Nova\Fields\Select;
 use Laravel\Nova\Fields\Text;
-use Laravel\Nova\Fields\Textarea;
 use Laravel\Nova\Http\Requests\NovaRequest;
+use Laravel\Nova\Fields\HasMany;
+use Laravel\Nova\Fields\DateTime;
+use Laravel\Nova\Fields\Select;
 
-class Notification extends Resource
+class Order extends Resource
 {
     /**
      * The model the resource corresponds to.
      *
-     * @var class-string<\App\Models\Notification>
+     * @var class-string<\App\Models\Order>
      */
-    public static $model = \App\Models\Notification::class;
+    public static $model = \App\Models\Order::class;
 
     /**
      * The single value that should be used to represent the resource when being displayed.
@@ -45,12 +44,19 @@ class Notification extends Resource
     public function fields(NovaRequest $request)
     {
         return [
-            ID::make()->sortable(),
-            Text::make('source')->readonly(),
-            Markdown::make('payload')->readonly(),
-            Select::make('status')->options(['new' => 'new', 'processed_ok' => 'processed_ok', 'processed_error' => 'processed_error', 'ignored' => 'ignored']),
-            Markdown::make('result'),
-
+            ID::make('id', 'Id')->readonly()->sortable(),
+            Text::make('shopOrderNumber', 'ShopOrderNumber'),
+            Select::make('status', 'Status')->options([
+                0 => 'New',
+                1 => 'PartiallyCompleted',
+                2 => 'Completed',
+                3 => 'Cancelled'
+            ])->displayUsingLabels()->filterable(),
+            Text::make('customerName', 'CustomerName'),
+            Text::make('customerEmail', 'CustomerEmail'),
+            DateTime::make('created_at', 'CreatedAt')->readonly(),
+            DateTime::make('updated_at', 'UpdatedAt')->readonly(),
+            HasMany::make('Order Items', 'orderItems', OrderItem::class),
         ];
     }
 
