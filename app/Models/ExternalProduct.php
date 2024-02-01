@@ -12,7 +12,7 @@ class ExternalProduct extends Model
 
     public function products()
     {
-        return $this->belongsToMany(Product::class, 'Products', 'Id');
+        return $this->belongsToMany(Product::class, 'product_external_product', 'external_product_id', 'product_id');
     }
 
     public function externalConnection()

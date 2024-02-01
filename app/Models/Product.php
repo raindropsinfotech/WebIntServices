@@ -28,4 +28,9 @@ class Product extends Model
      */
     const UPDATED_AT = 'UpdatedAt'; // Replace with your uppercase column name
 
+
+    public function externalProducts()
+    {
+        return $this->belongsToMany(ExternalProduct::class, 'product_external_product', 'product_id', 'external_product_id');
+    }
 }

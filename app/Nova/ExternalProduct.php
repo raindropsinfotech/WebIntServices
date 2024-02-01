@@ -4,6 +4,7 @@ namespace App\Nova;
 
 use Illuminate\Http\Request;
 use Laravel\Nova\Fields\BelongsTo;
+use Laravel\Nova\Fields\BelongsToMany;
 use Laravel\Nova\Fields\Boolean;
 use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Fields\Text;
@@ -47,6 +48,7 @@ class ExternalProduct extends Resource
             BelongsTo::make('external_connection_id', 'externalConnection', ExternalConnection::class)->display('name'),
             Text::make('external_product_id'),
             Boolean::make('is_active'),
+            BelongsToMany::make('Products', 'products', Product::class)->display('FullName'),
 
         ];
     }

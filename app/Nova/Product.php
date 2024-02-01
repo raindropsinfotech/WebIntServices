@@ -3,6 +3,7 @@
 namespace App\Nova;
 
 use Illuminate\Http\Request;
+use Laravel\Nova\Fields\BelongsToMany;
 use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Http\Requests\NovaRequest;
@@ -44,6 +45,7 @@ class Product extends Resource
             ID::make('id', 'Id')->sortable(),
             Text::make('name', 'Name'),
             Text::make('fullName', 'FullName'),
+            BelongsToMany::make('ExternalProducts', 'externalProducts', ExternalProduct::class),
         ];
     }
 
