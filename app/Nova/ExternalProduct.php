@@ -3,22 +3,21 @@
 namespace App\Nova;
 
 use Illuminate\Http\Request;
-use Laravel\Nova\Fields\Code;
+use Laravel\Nova\Fields\BelongsTo;
+use Laravel\Nova\Fields\BelongsToMany;
+use Laravel\Nova\Fields\Boolean;
 use Laravel\Nova\Fields\ID;
-use Laravel\Nova\Fields\Markdown;
-use Laravel\Nova\Fields\Select;
 use Laravel\Nova\Fields\Text;
-use Laravel\Nova\Fields\Textarea;
 use Laravel\Nova\Http\Requests\NovaRequest;
 
-class Notification extends Resource
+class ExternalProduct extends Resource
 {
     /**
      * The model the resource corresponds to.
      *
-     * @var class-string<\App\Models\Notification>
+     * @var class-string<\App\Models\ExternalProduct>
      */
-    public static $model = \App\Models\Notification::class;
+    public static $model = \App\Models\ExternalProduct::class;
 
     /**
      * The single value that should be used to represent the resource when being displayed.
@@ -46,10 +45,10 @@ class Notification extends Resource
     {
         return [
             ID::make()->sortable(),
-            Text::make('source')->readonly(),
-            Markdown::make('payload')->readonly(),
-            Select::make('status')->options(['new' => 'new', 'processed_ok' => 'processed_ok', 'processed_error' => 'processed_error', 'ignored' => 'ignored']),
-            Markdown::make('result'),
+            BelongsTo::make('external_connection_id', 'externalConnection', ExternalConnection::class)->display('name'),
+            Text::make('external_product_id'),
+            Boolean::make('is_active'),
+            BelongsToMany::make('Products', 'products', Product::class)->display('FullName'),
 
         ];
     }

@@ -2,23 +2,23 @@
 
 namespace App\Nova;
 
+
 use Illuminate\Http\Request;
-use Laravel\Nova\Fields\Code;
+use Laravel\Nova\Fields\Boolean;
 use Laravel\Nova\Fields\ID;
-use Laravel\Nova\Fields\Markdown;
-use Laravel\Nova\Fields\Select;
 use Laravel\Nova\Fields\Text;
-use Laravel\Nova\Fields\Textarea;
+use Laravel\Nova\Fields\DateTime;
+use Laravel\Nova\Fields\BelongsTo;
 use Laravel\Nova\Http\Requests\NovaRequest;
 
-class Notification extends Resource
+class OrderItem extends Resource
 {
     /**
      * The model the resource corresponds to.
      *
-     * @var class-string<\App\Models\Notification>
+     * @var class-string<\App\Models\OrderItem>
      */
-    public static $model = \App\Models\Notification::class;
+    public static $model = \App\Models\OrderItem::class;
 
     /**
      * The single value that should be used to represent the resource when being displayed.
@@ -45,11 +45,16 @@ class Notification extends Resource
     public function fields(NovaRequest $request)
     {
         return [
-            ID::make()->sortable(),
-            Text::make('source')->readonly(),
-            Markdown::make('payload')->readonly(),
-            Select::make('status')->options(['new' => 'new', 'processed_ok' => 'processed_ok', 'processed_error' => 'processed_error', 'ignored' => 'ignored']),
-            Markdown::make('result'),
+            ID::make('id', 'Id')->sortable(),
+            Text::make('externalId', 'ExrenalId'),
+            BelongsTo::make('Product', 'product', Product::class)->display('FullName'),
+            BelongsTo::make('Order', 'order', Order::class)->display('ShopOrderNumber')->readonly(),
+            Text::make('adults', 'Adults'),
+            Text::make('children', 'Children'),
+            DateTime::make('serviceDateTime', 'ServiceDateTime'),
+            Boolean::make('isProcessed', 'IsProcessed'),
+            DateTime::make('created_at', 'CreatedAt')->readonly(),
+            DateTime::make('updated_at', 'UpdatedAt')->readonly(),
 
         ];
     }
