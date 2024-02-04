@@ -64,4 +64,9 @@ class Order extends Model
             3 => 'Cancelled'
         ],
     ];
+
+    public function externalConnection()
+    {
+        return $this->belongsTo(ExternalConnection::class);
+    }
 }
