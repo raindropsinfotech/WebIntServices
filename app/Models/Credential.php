@@ -5,13 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Product extends Model
+class Credential extends Model
 {
     use HasFactory;
-    protected $connection = 'ticketsender';
-    protected $table = 'Products';
-    protected $primaryKey = 'Id';
 
+    protected $connection = 'ticketsender';
+    protected $table = 'Credentials';
+    protected $primaryKey = 'Id';
     public $timestamps = true;
 
     /**
@@ -28,21 +28,20 @@ class Product extends Model
      */
     const UPDATED_AT = 'UpdatedAt'; // Replace with your uppercase column name
 
-
-    public function externalProducts()
-    {
-        return $this->belongsToMany(ExternalProduct::class, 'product_external_product', 'product_id', 'external_product_id');
-    }
-
     /**
      * The attributes that are enum.
      *
      * @var array
      */
     protected $enums = [
-        'ProductType' => [
-            0 => 'Single',
-            1 => 'Combo'
+        'CredentialType' => [
+            0 => 'Ecwid',
+            1 => 'Bokun',
+            3 => 'Rayna',
+            4 => 'Stripe',
+            5 => 'Razorpay',
+            6 => 'Twilio',
+            7 => 'CurrencyConverter'
         ],
     ];
 }

@@ -2,6 +2,7 @@
 
 namespace App\Nova;
 
+use App\Nova\Actions\ProcessNotification;
 use Illuminate\Http\Request;
 use Laravel\Nova\Fields\Code;
 use Laravel\Nova\Fields\ID;
@@ -95,6 +96,11 @@ class Notification extends Resource
      */
     public function actions(NovaRequest $request)
     {
-        return [];
+        return [
+            (new ProcessNotification())->canSee(function ($request) {
+                // Add authorization logic if needed
+                return true;
+            })
+        ];
     }
 }

@@ -3,20 +3,19 @@
 namespace App\Nova;
 
 use Illuminate\Http\Request;
-use Laravel\Nova\Fields\BelongsToMany;
 use Laravel\Nova\Fields\ID;
-use Laravel\Nova\Fields\Select;
-use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Http\Requests\NovaRequest;
+use Laravel\Nova\Fields\BelongsTo;
+use Laravel\Nova\Fields\Text;
 
-class Product extends Resource
+class CredentialExternalConnectionMapping extends Resource
 {
     /**
      * The model the resource corresponds to.
      *
-     * @var class-string<\App\Models\Product>
+     * @var class-string<\App\Models\CredentialExternalConnectionMapping>
      */
-    public static $model = \App\Models\Product::class;
+    public static $model = \App\Models\CredentialExternalConnectionMapping::class;
 
     /**
      * The single value that should be used to represent the resource when being displayed.
@@ -43,14 +42,11 @@ class Product extends Resource
     public function fields(NovaRequest $request)
     {
         return [
-            ID::make('id', 'Id')->sortable(),
-            Text::make('name', 'Name'),
-            Text::make('fullName', 'FullName'),
-            Select::make('productType', 'ProductType')->options([
-                0 => 'Single',
-                1 => 'Combo'
-            ])->displayUsingLabels()->filterable(),
-            BelongsToMany::make('ExternalProducts', 'externalProducts', ExternalProduct::class),
+            ID::make()->sortable(),
+            Text::make('external_connection_id'),
+            Text::make('credential_id'),
+            // BelongsTo::make('External Connection', 'externalConnection', ExternalConnection::class)->searchable()->sortable()->display('name'),
+            // BelongsTo::make('Credentials', 'credential', Credential::class)->searchable()->sortable()->display('name'),
         ];
     }
 
