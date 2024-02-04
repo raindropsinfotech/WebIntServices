@@ -11,4 +11,14 @@ class CredentialExternalConnectionMapping extends Model
 
     protected $connection = 'ticketsender';
     public $timestamps = true;
+
+    public function externalConnection()
+    {
+        return $this->belongsTo(ExternalConnection::class);
+    }
+
+    public function credential()
+    {
+        return $this->belongsTo(Credential::class, 'credential_id', 'Id');
+    }
 }

@@ -48,6 +48,7 @@ class Credential extends Resource
     {
         return [
             ID::make('id', 'Id')->readonly()->sortable(),
+            Text::make('name', 'Name'),
             Select::make('credentialType', 'CredentialType')->options([
                 0 => 'Ecwid',
                 1 => 'Bokun',

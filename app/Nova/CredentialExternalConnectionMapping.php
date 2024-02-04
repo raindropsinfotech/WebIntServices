@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Http\Requests\NovaRequest;
 use Laravel\Nova\Fields\BelongsTo;
+use Laravel\Nova\Fields\Select;
 use Laravel\Nova\Fields\Text;
 
 class CredentialExternalConnectionMapping extends Resource
@@ -43,10 +44,20 @@ class CredentialExternalConnectionMapping extends Resource
     {
         return [
             ID::make()->sortable(),
-            Text::make('external_connection_id'),
-            Text::make('credential_id'),
-            // BelongsTo::make('External Connection', 'externalConnection', ExternalConnection::class)->searchable()->sortable()->display('name'),
-            // BelongsTo::make('Credentials', 'credential', Credential::class)->searchable()->sortable()->display('name'),
+            Select::make('External Connection', 'external_connection_id')
+                ->options(\App\Models\ExternalConnection::pluck('name', 'id'))
+                ->searchable()
+                ->sortable()
+                ->hideFromIndex(),
+
+            Select::make('Credentials', 'credential_id')
+                ->options(\App\Models\Credential::where('Active', true)->pluck('name', 'Id'))
+                ->searchable()
+                ->sortable()->hideFromIndex(),
+
+
+            BelongsTo::make('External Connection', 'externalConnection', ExternalConnection::class)->searchable()->sortable()->display('name')->hideWhenCreating()->hideWhenUpdating(),
+            BelongsTo::make('Credential', 'credential', Credential::class)->searchable()->display('Name')->readonly()->hideWhenCreating()->hideWhenUpdating(),
         ];
     }
 
