@@ -3,20 +3,24 @@
 namespace App\Nova;
 
 use Illuminate\Http\Request;
-use Laravel\Nova\Fields\BelongsToMany;
 use Laravel\Nova\Fields\ID;
-use Laravel\Nova\Fields\Select;
-use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Http\Requests\NovaRequest;
+use Laravel\Nova\Fields\DateTime;
+use Laravel\Nova\Fields\Boolean;
+use Laravel\Nova\Fields\Markdown;
+use Laravel\Nova\Fields\Password;
+use Laravel\Nova\Fields\Text;
+use Laravel\Nova\Fields\Select;
 
-class Product extends Resource
+
+class Credential extends Resource
 {
     /**
      * The model the resource corresponds to.
      *
-     * @var class-string<\App\Models\Product>
+     * @var class-string<\App\Models\Credential>
      */
-    public static $model = \App\Models\Product::class;
+    public static $model = \App\Models\Credential::class;
 
     /**
      * The single value that should be used to represent the resource when being displayed.
@@ -43,14 +47,24 @@ class Product extends Resource
     public function fields(NovaRequest $request)
     {
         return [
-            ID::make('id', 'Id')->sortable(),
+            ID::make('id', 'Id')->readonly()->sortable(),
             Text::make('name', 'Name'),
-            Text::make('fullName', 'FullName'),
-            Select::make('productType', 'ProductType')->options([
-                0 => 'Single',
-                1 => 'Combo'
+            Select::make('credentialType', 'CredentialType')->options([
+                0 => 'Ecwid',
+                1 => 'Bokun',
+                3 => 'Rayna',
+                4 => 'Stripe',
+                5 => 'Razorpay',
+                6 => 'Twilio',
+                7 => 'CurrencyConverter'
             ])->displayUsingLabels()->filterable(),
-            BelongsToMany::make('ExternalProducts', 'externalProducts', ExternalProduct::class),
+            Boolean::make('active', 'Active'),
+            Text::make('baseUrl', 'BaseUrl'),
+            Text::make('username', 'Username'),
+            Password::make('password', 'Password'),
+            Markdown::make('comment', 'Comment'),
+            DateTime::make('created_at', 'CreatedAt')->readonly(),
+            DateTime::make('updated_at', 'UpdatedAt')->readonly(),
         ];
     }
 
