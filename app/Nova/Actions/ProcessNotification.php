@@ -61,29 +61,37 @@ class ProcessNotification extends Action
 
 
 
-        $payload = $notification->payload;
-        $sellerId = $payload->seller->id;
-        if (isNull($sellerId) || $sellerId == 0) {
+        // $payload = $notification->payload;
+        // $sellerId = $payload->seller->id;
+        // if (isNull($sellerId) || $sellerId == 0) {
 
-            $notification->status = 'processed_error';
-            $notification->result = 'No seller Id found on the payload';
-            $notification->save();
-            return;
-        }
+        //     $notification->status = 'processed_error';
+        //     $notification->result = 'No seller Id found on the payload';
+        //     $notification->save();
+        //     return;
+        // }
 
-        // check if external_connection for bokun
-        $external_connection = \APP\Models\ExternalConnection::where('external_id', $sellerId)->first();
+        // // check if external_connection for bokun
+        // $external_connection = \APP\Models\ExternalConnection::where('external_id', $sellerId)->first();
 
-        if ($external_connection == null) {
-            $notification->status = 'processed_error';
-            $notification->result = 'No external_connection found for seller ' . $sellerId;
-            $notification->save();
-            return;
-        }
+        // if ($external_connection == null) {
+        //     $notification->status = 'processed_error';
+        //     $notification->result = 'No external_connection found for seller ' . $sellerId;
+        //     $notification->save();
+        //     return;
+        // }
 
-        $order = \APP\Models\Order::where('ShopOrderNumber', $payload->confirmationCode);
-        if ($order == null)
-            $order = new \App\Models\Order();
+
+        // $order = \APP\Models\Order::where('ShopOrderNumber', $payload->confirmationCode)
+        //     ->where('external_connection_id', $external_connection->id)->first();
+        // if ($order == null)
+        //     $order = new \App\Models\Order();
+        // $order->CustomerName = $payload->customer->firstName . ' ' . $payload->customer->firstName;
+        // $order->CustomerEmail = $payload->customer->email;
+        // $order->CustomerPhone = $payload->customer->phoneNumber;
+        // $order->ShopOrderNumber = $payload->confirmationCode;
+
+        // $order->save();
     }
 
     private function processEcwidNotification(\APP\Models\Notification $notification)

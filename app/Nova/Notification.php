@@ -47,7 +47,7 @@ class Notification extends Resource
     {
         return [
             ID::make()->sortable(),
-            Text::make('source')->readonly(),
+            Text::make('source')->filterable()->readonly(),
             Markdown::make('payload')->readonly(),
             Select::make('status')->options(['new' => 'new', 'processed_ok' => 'processed_ok', 'processed_error' => 'processed_error', 'ignored' => 'ignored']),
             Markdown::make('result'),
