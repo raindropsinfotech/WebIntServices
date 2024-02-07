@@ -69,4 +69,10 @@ class Order extends Model
     {
         return $this->belongsTo(ExternalConnection::class);
     }
+
+    protected $attributes = [
+        'Status' => 0,
+        'PaymentStatus' => 0,
+        'ShopSystem' => 0 // in next version this will be obsolete as we will use external_connection
+    ];
 }

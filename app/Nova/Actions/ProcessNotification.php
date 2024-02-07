@@ -10,6 +10,7 @@ use Laravel\Nova\Actions\Action;
 use Laravel\Nova\Fields\ActionFields;
 use Laravel\Nova\Http\Requests\NovaRequest;
 
+use function Laravel\Prompts\text;
 use function PHPUnit\Framework\isNull;
 
 class ProcessNotification extends Action
@@ -31,6 +32,7 @@ class ProcessNotification extends Action
         foreach ($models as $notification) {
             if ($notification->source == 'bokun') {
                 // process bokun notification
+                $this->processBokunNotification($notification);
             }
 
             if ($notification->source == 'ecwid') {
@@ -61,40 +63,125 @@ class ProcessNotification extends Action
 
 
 
-        // $payload = $notification->payload;
-        // $sellerId = $payload->seller->id;
-        // if (isNull($sellerId) || $sellerId == 0) {
+        $payloadArray = json_decode($notification->payload);
 
-        //     $notification->status = 'processed_error';
-        //     $notification->result = 'No seller Id found on the payload';
-        //     $notification->save();
-        //     return;
-        // }
+        if (!isset($payloadArray->seller) || !isset($payloadArray->seller->id)) {
+            $notification->status = 'processed_error';
+            $notification->result = 'No seller info found.';
+            $notification->save();
 
-        // // check if external_connection for bokun
-        // $external_connection = \APP\Models\ExternalConnection::where('external_id', $sellerId)->first();
+            return;
+        }
+        $sellerId = $payloadArray->seller->id;
+        if (!isset($sellerId)) {
 
-        // if ($external_connection == null) {
-        //     $notification->status = 'processed_error';
-        //     $notification->result = 'No external_connection found for seller ' . $sellerId;
-        //     $notification->save();
-        //     return;
-        // }
+            $notification->status = 'processed_error';
+            $notification->result = 'No seller Id found on the payload' . json_encode($payloadArray->seller->id);
+            $notification->save();
+            return;
+        }
+
+        // check if external_connection for bokun
+        $external_connection = \App\Models\ExternalConnection::where('connection_type', 'bokun')->where('external_id', $sellerId)->first();
+
+        if ($external_connection == null) {
+            $notification->status = 'processed_error';
+            $notification->result = 'No external_connection found for seller ' . $sellerId;
+            $notification->save();
+            return;
+        }
 
 
-        // $order = \APP\Models\Order::where('ShopOrderNumber', $payload->confirmationCode)
-        //     ->where('external_connection_id', $external_connection->id)->first();
-        // if ($order == null)
-        //     $order = new \App\Models\Order();
-        // $order->CustomerName = $payload->customer->firstName . ' ' . $payload->customer->firstName;
-        // $order->CustomerEmail = $payload->customer->email;
-        // $order->CustomerPhone = $payload->customer->phoneNumber;
-        // $order->ShopOrderNumber = $payload->confirmationCode;
+        $order = \App\Models\Order::where('ShopOrderNumber', $payloadArray->confirmationCode)
+            ->where('external_connection_id', $external_connection->id)->first();
+        if ($order == null)
+            $order = new \App\Models\Order();
 
-        // $order->save();
+        $order->CustomerName = $payloadArray->customer->firstName . ' ' . $payloadArray->customer->firstName;
+        $order->CustomerEmail = $payloadArray->customer->email;
+        // $order->CustomerPhone = $payloadArray->customer->phoneNumber;
+        $order->ShopOrderNumber = $payloadArray->confirmationCode;
+        $order->OrderDateTime = date("Y-m-d H:i:s", $payloadArray->creationDate / 1000); //$this->getDateFromTimestamp($payloadArray->creationDate);
+        $order->OrderTotal = $payloadArray->totalPrice;
+        $order->external_connection_id = $external_connection->id;
+        $order->save();
+
+        if (!isset($payloadArray->activityBookings)) {
+            $notification->status = 'processed_error';
+            $notification->result = 'No activityBookings found for order ' . $$payloadArray->confirmationCode;
+            $notification->save();
+            return;
+        }
+        foreach ($payloadArray->activityBookings as $activityBooking) {
+            $external_product = \App\Models\ExternalProduct::where('external_connection_id', $external_connection->id)->where('external_product_id', $activityBooking->rateId)->first();
+
+            if (!isset($external_product)) {
+                $notification->status = 'processed_error';
+                $notification->result = 'No Product found with external_product_id(' . $activityBooking->rateId . ') and external_connection(' . $external_connection->name . ').';
+                $notification->save();
+                return;
+            }
+            $products = $external_product->products()->get();
+
+            if (!isset($products)) {
+                $notification->status = 'processed_error';
+                $notification->result = 'No Product attached with external_product_id(' . $external_product->external_product_id . ') and external_connection(' . $external_connection->name . ').';
+                $notification->save();
+                return;
+            }
+
+            //$notification->status = 'processed_error';
+//            $notification->result = 'Products count = ' . $products->count();
+//            $notification->save();
+//
+//            $text ="";
+//            foreach ($products->get() as $product){
+//                $text .= $product->Name;
+//            }
+//            $notification->result = $text;
+//            $notification->save();
+//            return;
+
+            foreach ($products as $product) {
+
+                $orderitem = \App\Models\OrderItem::where('OrderId', $order->Id)
+                    ->where('ProductId', $product->Id)
+                    ->where('ExrenalId',$activityBooking->barcode->value)
+                    ->first();
+
+                if ($orderitem == null)
+                    $orderitem = new \app\models\orderitem();
+
+                $orderitem->ProductId = $product->Id;
+                $orderitem->servicedatetime = date("y-m-d h:i:s", $activityBooking->date / 1000);
+                $orderitem->Adults = $activityBooking->totalParticipants;
+                $orderitem->ExrenalId = $activityBooking->barcode->value;
+                $orderitem->OrderId = $order->Id;
+
+                $orderitem->save();
+            }
+        }
+        $notification->status = 'processed_ok';
+        $notification->result = "order created with Id " . $order->Id;
+
+        $notification->save();
     }
 
     private function processEcwidNotification(\APP\Models\Notification $notification)
     {
+    }
+
+    private function getDateFromTimestamp($timestamp)
+    {
+
+        $timestamp_ms = $timestamp; // Timestamp in milliseconds
+        $timestamp_s = $timestamp_ms / 1000; // Convert milliseconds to seconds
+
+        // Convert timestamp to human-readable date
+        $date = date("Y-m-d H:i:s", $timestamp_s);
+
+        echo $date; // Output: 2025-10-08 00:00:00
+
+        return $date;
     }
 }
