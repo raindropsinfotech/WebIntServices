@@ -30,13 +30,14 @@ class ProcessNotification extends Action
         $totalNotification = count($models);
         $processedNotifications = 0;
         foreach ($models as $notification) {
-            if ($notification->source == 'bokun') {
+            if ($notification->source === 'bokun') {
                 // process bokun notification
                 $this->processBokunNotification($notification);
             }
 
             if ($notification->source == 'ecwid') {
                 // process ecwid notification
+                $this->processEcwidNotification($notification);
             }
 
             $processedNotifications++;
@@ -60,8 +61,6 @@ class ProcessNotification extends Action
     {
         if ($notification->source != 'bokun')
             return;
-
-
 
         $payloadArray = json_decode($notification->payload);
 
@@ -172,6 +171,69 @@ class ProcessNotification extends Action
 
     private function processEcwidNotification(\APP\Models\Notification $notification)
     {
+        if ($notification->source != 'ecwid')
+            return;
+
+        $payloadArray = json_decode($notification->payload);
+
+        if (!isset($payloadArray->data) || !isset($payloadArray->storeId) || !isset($payloadArray->data->orderId)) {
+            $notification->status = 'processed_error';
+            $notification->result = 'No order or store info found.';
+            $notification->save();
+            return;
+        }
+
+        $store_id = $payloadArray->storeId;
+
+
+        if (($payloadArray->eventType != 'order.created') || $payloadArray->data->newPaymentStatus != 'PAID' || $payloadArray->data->newFulfillmentStatus != 'AWAITING_PROCESSING') {
+            $notification->status = 'ingnored';
+            $notification->result = 'Ignored because system only process PAID orders.';
+            $notification->save();
+            return;
+        }
+
+        $external_connection = \App\Models\ExternalConnection::where('is_active', true)->where('connection_type', 'ecwid')->where('external_id', $payloadArray->storeId)->first();
+        if (!isset($external_connection)) {
+            $notification->status = 'processed_error';
+            $notification->result = 'No active external connection found for Ecwid (' . $payloadArray->storeId  . ')';
+            $notification->save();
+            return;
+        }
+
+        $credentilasMapping = \App\Models\CredentialExternalConnectionMapping::where('external_connection_id', $external_connection->id)->first();
+        if (!isset($credentilasMapping)) {
+            $notification->status = 'processed_error';
+            $notification->result = 'No  external connection - credentila mapping found for External_Connection (' . $external_connection->name . ')';
+            $notification->save();
+            return;
+        }
+
+        $notification->result = 'ExternalConnection-Credential mapping found!';
+        $notification->save();
+
+        $credentials = $credentilasMapping->credential;
+
+        if (!isset($credentials)) {
+            $notification->status = 'processed_error';
+            $notification->result = 'No  credentials found.';
+            $notification->save();
+            return;
+        }
+        $storeId = $credentials->Username;
+        $token = $credentials->Password;
+
+
+        $ecwidResponse = $this->getEcwidOrder($storeId, $token, $payloadArray->data->orderId);
+
+        $notification->result = $ecwidResponse;
+        $notification->save();
+        return;
+
+        // TODO: check order payments
+        // TODO: check if order items are configured or not
+        // TODO: importn order items in system
+        // fetch order from ecwid
     }
 
     private function getDateFromTimestamp($timestamp)
@@ -186,5 +248,20 @@ class ProcessNotification extends Action
         echo $date; // Output: 2025-10-08 00:00:00
 
         return $date;
+    }
+
+    private function getEcwidOrder($storeId, $token, $orderId)
+    {
+
+        $client = new \GuzzleHttp\Client();
+        $url = "https://app.ecwid.com/api/v3/{$storeId}/orders/{$orderId}";
+        $response = $client->request('GET', $url, [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $token,
+                'accept' => 'application/json',
+            ],
+        ]);
+
+        return $response->getBody();
     }
 }
