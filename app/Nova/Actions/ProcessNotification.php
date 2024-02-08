@@ -106,6 +106,9 @@ class ProcessNotification extends Action
         $order->external_connection_id = $external_connection->id;
         $order->save();
 
+        $notification->order_id = $order->Id;
+        $notification->save();
+
         if (!isset($payloadArray->activityBookings)) {
             $notification->status = 'processed_error';
             $notification->result = 'No activityBookings found for order ' . $$payloadArray->confirmationCode;
@@ -131,22 +134,22 @@ class ProcessNotification extends Action
             }
 
             //$notification->status = 'processed_error';
-//            $notification->result = 'Products count = ' . $products->count();
-//            $notification->save();
-//
-//            $text ="";
-//            foreach ($products->get() as $product){
-//                $text .= $product->Name;
-//            }
-//            $notification->result = $text;
-//            $notification->save();
-//            return;
+            //            $notification->result = 'Products count = ' . $products->count();
+            //            $notification->save();
+            //
+            //            $text ="";
+            //            foreach ($products->get() as $product){
+            //                $text .= $product->Name;
+            //            }
+            //            $notification->result = $text;
+            //            $notification->save();
+            //            return;
 
             foreach ($products as $product) {
 
                 $orderitem = \App\Models\OrderItem::where('OrderId', $order->Id)
                     ->where('ProductId', $product->Id)
-                    ->where('ExrenalId',$activityBooking->barcode->value)
+                    ->where('ExrenalId', $activityBooking->barcode->value)
                     ->first();
 
                 if ($orderitem == null)
