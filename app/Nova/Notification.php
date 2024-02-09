@@ -51,7 +51,7 @@ class Notification extends Resource
             Markdown::make('payload')->readonly(),
             Select::make('status')->options(['new' => 'new', 'processed_ok' => 'processed_ok', 'processed_error' => 'processed_error', 'ignored' => 'ignored']),
             Markdown::make('result'),
-
+            Text::make('order_id')->readonly()
         ];
     }
 

@@ -43,8 +43,9 @@ class OrderItem extends Model
         'Availibility' => 0,
         'BookingStatus' => 0,
         'DeliveryStatus' => 0,
-        'RaynaBookingId' => 0
-
+        'RaynaBookingId' => 0,
+        'Children' => 0,
+        'IsProcessed' => 0
     ];
 
     public function product()
