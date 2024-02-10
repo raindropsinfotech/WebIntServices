@@ -62,6 +62,10 @@ class ProcessNotification extends Action
         if ($notification->source != 'bokun')
             return;
 
+        // $payload = $notification->payload;
+        // var_dump($payload);
+
+
         $payloadArray = json_decode($notification->payload);
 
         if (!isset($payloadArray->seller) || !isset($payloadArray->seller->id)) {
@@ -132,17 +136,6 @@ class ProcessNotification extends Action
                 return;
             }
 
-            //$notification->status = 'processed_error';
-            //            $notification->result = 'Products count = ' . $products->count();
-            //            $notification->save();
-            //
-            //            $text ="";
-            //            foreach ($products->get() as $product){
-            //                $text .= $product->Name;
-            //            }
-            //            $notification->result = $text;
-            //            $notification->save();
-            //            return;
 
             foreach ($products as $product) {
 
