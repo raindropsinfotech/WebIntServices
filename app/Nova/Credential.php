@@ -61,7 +61,10 @@ class Credential extends Resource
             Boolean::make('active', 'Active'),
             Text::make('baseUrl', 'BaseUrl'),
             Text::make('username', 'Username'),
-            Password::make('password', 'Password'),
+            Text::make('password', 'Password'),
+            // Password::make('password', 'Password')->displayUsing(function ($value) {
+            //     return $value;
+            // }),
             Markdown::make('comment', 'Comment'),
             DateTime::make('created_at', 'CreatedAt')->readonly(),
             DateTime::make('updated_at', 'UpdatedAt')->readonly(),

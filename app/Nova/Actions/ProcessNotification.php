@@ -3,15 +3,12 @@
 namespace App\Nova\Actions;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Collection;
 use Laravel\Nova\Actions\Action;
 use Laravel\Nova\Fields\ActionFields;
 use Laravel\Nova\Http\Requests\NovaRequest;
 
-use function Laravel\Prompts\text;
-use function PHPUnit\Framework\isNull;
 
 class ProcessNotification extends Action
 {
@@ -90,20 +87,15 @@ class ProcessNotification extends Action
             return;
         }
 
+        $customerName =  $payloadArray->customer->firstName . ' ' . $payloadArray->customer->firstName;
+        $order = $this->GetOrder($external_connection->id, $payloadArray->confirmationCode, $payloadArray->totalPrice, date("Y-m-d H:i:s", $payloadArray->creationDate / 1000), $payloadArray->customer->email, $customerName, $payloadArray->customer->phoneNumber);
 
-        $order = \App\Models\Order::where('ShopOrderNumber', $payloadArray->confirmationCode)
-            ->where('external_connection_id', $external_connection->id)->first();
-        if ($order == null)
-            $order = new \App\Models\Order();
-
-        $order->CustomerName = $payloadArray->customer->firstName . ' ' . $payloadArray->customer->firstName;
-        $order->CustomerEmail = $payloadArray->customer->email;
-        // $order->CustomerPhone = $payloadArray->customer->phoneNumber;
-        $order->ShopOrderNumber = $payloadArray->confirmationCode;
-        $order->OrderDateTime = date("Y-m-d H:i:s", $payloadArray->creationDate / 1000); //$this->getDateFromTimestamp($payloadArray->creationDate);
-        $order->OrderTotal = $payloadArray->totalPrice;
-        $order->external_connection_id = $external_connection->id;
-        $order->save();
+        if (!isset($order)) {
+            $notification->status = 'processed_error';
+            $notification->result = 'Unable to create order.';
+            $notification->save();
+            return;
+        }
 
         $notification->order_id = $order->Id;
         $notification->save();
@@ -132,35 +124,10 @@ class ProcessNotification extends Action
                 return;
             }
 
-            //$notification->status = 'processed_error';
-            //            $notification->result = 'Products count = ' . $products->count();
-            //            $notification->save();
-            //
-            //            $text ="";
-            //            foreach ($products->get() as $product){
-            //                $text .= $product->Name;
-            //            }
-            //            $notification->result = $text;
-            //            $notification->save();
-            //            return;
 
             foreach ($products as $product) {
 
-                $orderitem = \App\Models\OrderItem::where('OrderId', $order->Id)
-                    ->where('ProductId', $product->Id)
-                    ->where('ExrenalId', $activityBooking->barcode->value)
-                    ->first();
-
-                if ($orderitem == null)
-                    $orderitem = new \app\models\orderitem();
-
-                $orderitem->ProductId = $product->Id;
-                $orderitem->servicedatetime = date("y-m-d h:i:s", $activityBooking->date / 1000);
-                $orderitem->Adults = $activityBooking->totalParticipants;
-                $orderitem->ExrenalId = $activityBooking->barcode->value;
-                $orderitem->OrderId = $order->Id;
-
-                $orderitem->save();
+                $this->addOrdeItem($order->Id, $product->Id, $activityBooking->barcode->value, date("y-m-d h:i:s", $activityBooking->date / 1000), $activityBooking->totalParticipants);
             }
         }
         $notification->status = 'processed_ok';
@@ -224,16 +191,63 @@ class ProcessNotification extends Action
         $token = $credentials->Password;
 
 
-        $ecwidResponse = $this->getEcwidOrder($storeId, $token, $payloadArray->data->orderId);
+        $ecwidResponseData = $this->getEcwidOrder($storeId, $token, $payloadArray->data->orderId);
 
-        $notification->result = $ecwidResponse;
+        $notification->result = $ecwidResponseData;
         $notification->save();
-        return;
 
-        // TODO: check order payments
-        // TODO: check if order items are configured or not
-        // TODO: importn order items in system
-        // fetch order from ecwid
+        $ecwidResponse = json_decode($ecwidResponseData);
+
+        $order = $this->getOrder($external_connection->id, $ecwidResponse->id, $ecwidResponse->total, date("y-m-d h:i:s", $ecwidResponse->createTimestamp), $ecwidResponse->email, $ecwidResponse->billingPerson->name, $ecwidResponse->billingPerson->phone);
+        if (!isset($order)) {
+            $notification->status = 'processed_error';
+            $notification->result = 'Unable to create order.';
+            $notification->save();
+            return;
+        }
+
+        $notification->order_id = $order->Id;
+        $notification->save();
+
+        foreach ($ecwidResponse->items as $item) {
+            $external_product = \App\Models\ExternalProduct::where('external_connection_id', $external_connection->id)->where('external_product_id', $item->sku)->first();
+
+            if (!isset($external_product)) {
+                $notification->status = 'processed_error';
+                $notification->result = 'No Product found with external_product_id(' . $item->sku . ') and external_connection(' . $external_connection->name . ').';
+                $notification->save();
+                return;
+            }
+            $products = $external_product->products()->get();
+
+            if (!isset($products)) {
+                $notification->status = 'processed_error';
+                $notification->result = 'No Product attached with external_product_id(' . $external_product->external_product_id . ') and external_connection(' . $external_connection->name . ').';
+                $notification->save();
+                return;
+            }
+
+
+            foreach ($products as $product) {
+
+                $serviceDate = date("y-m-d h:i:s", strtotime('+2 days'));
+                $dateElement = array_filter($item->selectedOptions, function ($obj) {
+                    return $obj->type == 'DATE';
+                });
+                if (isset($dateElement)) {
+                    $serviceDate = date("y-m-d h:i:s", strtotime($dateElement[0]->value));
+                }
+
+
+                $this->addOrdeItem($order->Id, $product->Id, $item->id, $serviceDate, $item->quantity);
+            }
+        }
+
+
+        $notification->status = 'processed_ok';
+        $notification->result = "order created with Id " . $order->Id;
+
+        $notification->save();
     }
 
     private function getDateFromTimestamp($timestamp)
@@ -262,6 +276,47 @@ class ProcessNotification extends Action
             ],
         ]);
 
+
         return $response->getBody();
+    }
+
+    private function getOrder($external_connection_id, $shopOrderNumber,  $orderTotal, $orderDate, $customerEmail, $customerName, $customerPhone)
+    {
+        $order = \App\Models\Order::where('ShopOrderNumber', $shopOrderNumber)
+            ->where('external_connection_id', $external_connection_id)->first();
+        if ($order == null)
+            $order = new \App\Models\Order();
+
+        $order->CustomerName = $customerName;
+        $order->CustomerEmail = $customerEmail;
+        // $order->CustomerPhone = $payloadArray->customer->phoneNumber;
+        $order->ShopOrderNumber = $shopOrderNumber;
+        $order->OrderDateTime = $orderDate; //$this->getDateFromTimestamp($payloadArray->creationDate);
+        $order->OrderTotal = $orderTotal;
+        $order->external_connection_id = $external_connection_id;
+        $order->save();
+
+        return $order;
+    }
+
+    private function addOrdeItem($orderId, $productId, $shopOrderItemRference,  $serviceDate, $adultsCount, $childCount = 0)
+    {
+        $orderitem = \App\Models\OrderItem::where('OrderId', $orderId)
+            ->where('ProductId', $productId)
+            ->where('ExrenalId', $shopOrderItemRference)
+            ->first();
+
+        if ($orderitem == null)
+            $orderitem = new \app\models\orderitem();
+
+        $orderitem->ProductId = $productId;
+        $orderitem->servicedatetime = $serviceDate;
+        $orderitem->Adults = $adultsCount;
+        $orderitem->Children = $childCount;
+
+        $orderitem->ExrenalId = $shopOrderItemRference;
+        $orderitem->OrderId = $orderId;
+
+        $orderitem->save();
     }
 }
