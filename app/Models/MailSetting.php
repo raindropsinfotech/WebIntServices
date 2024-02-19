@@ -10,6 +10,7 @@ class MailSetting extends Model
     use HasFactory;
     protected $connection = 'ticketsender';
     protected $table = 'MailSettings';
+    protected $primaryKey = 'Id';
     public $timestamps = true;
 
     /**

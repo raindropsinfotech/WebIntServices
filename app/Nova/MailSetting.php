@@ -5,6 +5,7 @@ namespace App\Nova;
 use Illuminate\Http\Request;
 use Laravel\Nova\Fields\Boolean;
 use Laravel\Nova\Fields\ID;
+use Laravel\Nova\Fields\Number;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Http\Requests\NovaRequest;
 
@@ -46,12 +47,12 @@ class MailSetting extends Resource
             Text::make('host', 'Host'),
             Text::make('username', 'Username'),
             Text::make('paswword', 'Password'),
-            Text::make('port', 'Port'),
+            Number::make('port', 'Port'),
             Text::make('fromEmail', 'FromEmail'),
-            Text::make('ccEmail', 'CCEmail'),
-            Text::make('bccEmail', 'BCCEmail'),
-            Text::make('comment', 'Comment'),
-            Boolean::make('active', 'Acrtive')
+            Text::make('ccEmail', 'CCEmail')->nullable(),
+            Text::make('bccEmail', 'BCCEmail')->nullable(),
+            Text::make('comment', 'Comment')->nullable(),
+            Boolean::make('active', 'Active')->default(0)
         ];
     }
 
