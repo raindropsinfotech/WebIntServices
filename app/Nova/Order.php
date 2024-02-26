@@ -56,6 +56,7 @@ class Order extends Resource
             Text::make('customerEmail', 'CustomerEmail'),
             DateTime::make('created_at', 'CreatedAt')->readonly(),
             DateTime::make('updated_at', 'UpdatedAt')->readonly(),
+            Text::make('external_connection_id')->nullable(),
             HasMany::make('Order Items', 'orderItems', OrderItem::class),
         ];
     }
