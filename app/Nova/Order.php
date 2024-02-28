@@ -3,6 +3,8 @@
 namespace App\Nova;
 
 use Illuminate\Http\Request;
+use Laravel\Nova\Fields\Badge;
+use Laravel\Nova\Fields\Currency;
 use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Http\Requests\NovaRequest;
@@ -32,7 +34,7 @@ class Order extends Resource
      * @var array
      */
     public static $search = [
-        'id',
+        'id', 'shopOrderNumber',
     ];
 
     /**
@@ -58,6 +60,15 @@ class Order extends Resource
             DateTime::make('updated_at', 'UpdatedAt')->readonly(),
             Text::make('external_connection_id')->nullable(),
             HasMany::make('Order Items', 'orderItems', OrderItem::class),
+            Badge::make('PaymentStatus', 'PaymentStatus')
+                ->withIcons()
+                ->map([
+                    '0' => 'danger',
+                    '1' => 'danger',
+                    '2' => 'success',
+                    '3' => 'warning'
+                ]),
+            Currency::make('total', 'OrderTotal'),
         ];
     }
 

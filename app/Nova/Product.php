@@ -2,6 +2,7 @@
 
 namespace App\Nova;
 
+use App\Nova\Metrics\ProductsSold;
 use Illuminate\Http\Request;
 use Laravel\Nova\Fields\BelongsToMany;
 use Laravel\Nova\Fields\ID;
@@ -62,7 +63,9 @@ class Product extends Resource
      */
     public function cards(NovaRequest $request)
     {
-        return [];
+        return [
+            ProductsSold::make()->onlyOnDetail()->width('1/2')
+        ];
     }
 
     /**
