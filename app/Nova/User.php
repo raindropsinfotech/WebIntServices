@@ -2,14 +2,17 @@
 
 namespace App\Nova;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rules;
 use Laravel\Nova\Fields\BelongsToMany;
 use Laravel\Nova\Fields\Gravatar;
 use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Fields\Password;
+use Laravel\Nova\Fields\Select;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Http\Requests\NovaRequest;
+
 
 class User extends Resource
 {
@@ -64,7 +67,9 @@ class User extends Resource
                 ->creationRules('required', Rules\Password::defaults())
                 ->updateRules('nullable', Rules\Password::defaults()),
 
-            BelongsToMany::make('Roles'),
+            // BelongsToMany::make('Roles', 'roles', Role::class),
+
+            // Select::make('Roles')->options(\Spatie\Permission\Models\Role::pluck('name', 'name')),
         ];
     }
 
@@ -111,4 +116,26 @@ class User extends Resource
     {
         return [];
     }
+
+    // public function update(Request $request, \App\Models\User $user)
+    // {
+    //     // update the user
+
+    //     $user->update($request->all());
+
+    //     if ($request->has('roles')) {
+    //         $roles = $request->input('roles');
+    //         $user->assignRole($roles);
+    //     }
+
+    //     return parent::update($request, $user);
+    // }
+
+    // public static function afterUpdate(NovaRequest $request, Model $model)
+    // {
+    //     if ($request->has('roles')) {
+    //         $roles = $request->input('roles');
+    //         $model->assignRole($roles);
+    //     }
+    // }
 }

@@ -32,7 +32,7 @@ class ExternalProduct extends Resource
      * @var array
      */
     public static $search = [
-        'id',
+        'id', 'external_product_id',
     ];
 
     /**
@@ -45,8 +45,8 @@ class ExternalProduct extends Resource
     {
         return [
             ID::make()->sortable(),
-            BelongsTo::make('external_connection_id', 'externalConnection', ExternalConnection::class)->display('name'),
             Text::make('external_product_id'),
+            BelongsTo::make('external_connection_id', 'externalConnection', ExternalConnection::class)->display('name'),
             Boolean::make('is_active'),
             BelongsToMany::make('Products', 'products', Product::class)->display('FullName'),
 
