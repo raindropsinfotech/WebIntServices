@@ -2,6 +2,8 @@
 
 namespace App\Nova;
 
+use App\Nova\Actions\AssignPermissions;
+use App\Nova\Actions\AssignRole;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rules;
@@ -114,7 +116,14 @@ class User extends Resource
      */
     public function actions(NovaRequest $request)
     {
-        return [];
+        return [
+            (new AssignRole)->canSee(function ($request) {
+                return true;
+            }),
+            (new AssignPermissions)->canSee(function ($request) {
+                return true;
+            }),
+        ];
     }
 
     // public function update(Request $request, \App\Models\User $user)
