@@ -2,7 +2,7 @@
 
 namespace App\Nova;
 
-
+use App\Nova\Filters\OrderItemStatus;
 use Illuminate\Http\Request;
 use Laravel\Nova\Fields\Boolean;
 use Laravel\Nova\Fields\ID;
@@ -36,6 +36,12 @@ class OrderItem extends Resource
         'id',
     ];
 
+    /**
+     * The visual style used for the table. Available options are 'tight' and 'default'.
+     *
+     * @var string
+     */
+    public static $tableStyle = 'tight';
     /**
      * Get the fields displayed by the resource.
      *
@@ -78,7 +84,9 @@ class OrderItem extends Resource
      */
     public function filters(NovaRequest $request)
     {
-        return [];
+        return [
+            new OrderItemStatus(),
+        ];
     }
 
     /**
@@ -101,5 +109,18 @@ class OrderItem extends Resource
     public function actions(NovaRequest $request)
     {
         return [];
+    }
+
+    /**
+     * Get the menu that should represent the resource.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Laravel\Nova\Menu\MenuItem
+     */
+    public function menu(Request $request)
+    {
+        return parent::menu($request)->withBadge(function () {
+            return static::$model::where('IsProcessed', false)->count();
+        });
     }
 }

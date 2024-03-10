@@ -2,22 +2,21 @@
 
 namespace App\Nova;
 
-use App\Nova\Metrics\ProductsSold;
 use Illuminate\Http\Request;
-use Laravel\Nova\Fields\BelongsToMany;
+use Laravel\Nova\Fields\Boolean;
 use Laravel\Nova\Fields\ID;
-use Laravel\Nova\Fields\Select;
+use Laravel\Nova\Fields\Number;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Http\Requests\NovaRequest;
 
-class Product extends Resource
+class MailSetting extends Resource
 {
     /**
      * The model the resource corresponds to.
      *
-     * @var class-string<\App\Models\Product>
+     * @var class-string<\App\Models\MailSetting>
      */
-    public static $model = \App\Models\Product::class;
+    public static $model = \App\Models\MailSetting::class;
 
     /**
      * The single value that should be used to represent the resource when being displayed.
@@ -32,7 +31,7 @@ class Product extends Resource
      * @var array
      */
     public static $search = [
-        'id', 'name', 'fullName',
+        'id',
     ];
 
     /**
@@ -45,13 +44,15 @@ class Product extends Resource
     {
         return [
             ID::make('id', 'Id')->sortable(),
-            Text::make('name', 'Name'),
-            Text::make('fullName', 'FullName'),
-            Select::make('productType', 'ProductType')->options([
-                0 => 'Single',
-                1 => 'Combo'
-            ])->displayUsingLabels()->filterable(),
-            BelongsToMany::make('ExternalProducts', 'externalProducts', ExternalProduct::class),
+            Text::make('host', 'Host'),
+            Text::make('username', 'Username'),
+            Text::make('paswword', 'Password'),
+            Number::make('port', 'Port'),
+            Text::make('fromEmail', 'FromEmail'),
+            Text::make('ccEmail', 'CCEmail')->nullable(),
+            Text::make('bccEmail', 'BCCEmail')->nullable(),
+            Text::make('comment', 'Comment')->nullable(),
+            Boolean::make('active', 'Active')->default(0)
         ];
     }
 
@@ -63,9 +64,7 @@ class Product extends Resource
      */
     public function cards(NovaRequest $request)
     {
-        return [
-            ProductsSold::make()->onlyOnDetail()->width('1/2')
-        ];
+        return [];
     }
 
     /**
@@ -100,4 +99,12 @@ class Product extends Resource
     {
         return [];
     }
+
+
+    // public function menu(Request $request)
+    // {
+    //     return parent::menu($request)->withBadge(function () {
+    //         return static::$model::where('Active', true)->count();
+    //     });
+    // }
 }

@@ -3,6 +3,8 @@
 namespace App\Nova;
 
 use Illuminate\Http\Request;
+use Laravel\Nova\Fields\Badge;
+use Laravel\Nova\Fields\Currency;
 use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Http\Requests\NovaRequest;
@@ -32,8 +34,15 @@ class Order extends Resource
      * @var array
      */
     public static $search = [
-        'id',
+        'id', 'shopOrderNumber',
     ];
+
+    /**
+     * The visual style used for the table. Available options are 'tight' and 'default'.
+     *
+     * @var string
+     */
+    public static $tableStyle = 'tight';
 
     /**
      * Get the fields displayed by the resource.
@@ -56,7 +65,17 @@ class Order extends Resource
             Text::make('customerEmail', 'CustomerEmail'),
             DateTime::make('created_at', 'CreatedAt')->readonly(),
             DateTime::make('updated_at', 'UpdatedAt')->readonly(),
+            Text::make('external_connection_id')->nullable(),
             HasMany::make('Order Items', 'orderItems', OrderItem::class),
+            Badge::make('PaymentStatus', 'PaymentStatus')
+                ->withIcons()
+                ->map([
+                    '0' => 'danger',
+                    '1' => 'danger',
+                    '2' => 'success',
+                    '3' => 'warning'
+                ]),
+            Currency::make('total', 'OrderTotal'),
         ];
     }
 
@@ -102,5 +121,20 @@ class Order extends Resource
     public function actions(NovaRequest $request)
     {
         return [];
+    }
+
+    /**
+     * Get the menu that should represent the resource.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Laravel\Nova\Menu\MenuItem
+     */
+    public function menu(Request $request)
+    {
+        return parent::menu($request)->withBadge(function () {
+            return static::$model::where('PaymentStatus', 2)->where('Status', 0)
+                ->orWhere('Status', 1)
+                ->count();
+        });
     }
 }
