@@ -122,4 +122,19 @@ class Order extends Resource
     {
         return [];
     }
+
+    /**
+     * Get the menu that should represent the resource.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Laravel\Nova\Menu\MenuItem
+     */
+    public function menu(Request $request)
+    {
+        return parent::menu($request)->withBadge(function () {
+            return static::$model::where('PaymentStatus', 2)->where('Status', 0)
+                ->orWhere('Status', 1)
+                ->count();
+        });
+    }
 }

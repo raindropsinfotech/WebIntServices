@@ -2,23 +2,20 @@
 
 namespace App\Nova;
 
-use App\Nova\Filters\OrderItemStatus;
 use Illuminate\Http\Request;
 use Laravel\Nova\Fields\Boolean;
 use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Fields\Text;
-use Laravel\Nova\Fields\DateTime;
-use Laravel\Nova\Fields\BelongsTo;
 use Laravel\Nova\Http\Requests\NovaRequest;
 
-class OrderItem extends Resource
+class Setting extends Resource
 {
     /**
      * The model the resource corresponds to.
      *
-     * @var class-string<\App\Models\OrderItem>
+     * @var class-string<\App\Models\Setting>
      */
-    public static $model = \App\Models\OrderItem::class;
+    public static $model = \App\Models\Setting::class;
 
     /**
      * The single value that should be used to represent the resource when being displayed.
@@ -37,12 +34,6 @@ class OrderItem extends Resource
     ];
 
     /**
-     * The visual style used for the table. Available options are 'tight' and 'default'.
-     *
-     * @var string
-     */
-    public static $tableStyle = 'tight';
-    /**
      * Get the fields displayed by the resource.
      *
      * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
@@ -52,16 +43,10 @@ class OrderItem extends Resource
     {
         return [
             ID::make('id', 'Id')->sortable(),
-            Text::make('externalId', 'ExrenalId'),
-            BelongsTo::make('Product', 'product', Product::class)->display('FullName'),
-            BelongsTo::make('Order', 'order', Order::class)->display('ShopOrderNumber')->readonly(),
-            Text::make('adults', 'Adults'),
-            Text::make('children', 'Children'),
-            DateTime::make('serviceDateTime', 'ServiceDateTime'),
-            Boolean::make('isProcessed', 'IsProcessed'),
-            DateTime::make('created_at', 'CreatedAt')->readonly(),
-            DateTime::make('updated_at', 'UpdatedAt')->readonly(),
-
+            Text::make('TicketFolder', 'TicketFolder'),
+            Text::make('TemplateFolder', 'TemplateFolder'),
+            Text::make('Comment', 'Comment'),
+            Boolean::make('Active', 'Active'),
         ];
     }
 
@@ -84,9 +69,7 @@ class OrderItem extends Resource
      */
     public function filters(NovaRequest $request)
     {
-        return [
-            new OrderItemStatus(),
-        ];
+        return [];
     }
 
     /**
@@ -109,18 +92,5 @@ class OrderItem extends Resource
     public function actions(NovaRequest $request)
     {
         return [];
-    }
-
-    /**
-     * Get the menu that should represent the resource.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Laravel\Nova\Menu\MenuItem
-     */
-    public function menu(Request $request)
-    {
-        return parent::menu($request)->withBadge(function () {
-            return static::$model::where('IsProcessed', false)->count();
-        });
     }
 }

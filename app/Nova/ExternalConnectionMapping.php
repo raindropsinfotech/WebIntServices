@@ -47,28 +47,31 @@ class ExternalConnectionMapping extends Resource
                 ->options(\App\Models\ExternalConnection::pluck('name', 'id'))
                 ->searchable()
                 ->sortable()
-                ->hideFromIndex(),
+                ->hideFromIndex()
+                ->hideFromDetail(),
 
             Select::make('Shop Crednetial', 'shop_credential_id')
                 ->options(\App\Models\Credential::where('Active', true)->pluck('name', 'Id'))
-                ->searchable()
-                ->sortable()->hideFromIndex(),
+                ->hideFromDetail()
+                ->hideFromIndex(),
 
             Select::make('Payment Provider Crednetial', 'payment_provider_credential_id')
                 ->options(\App\Models\Credential::where('Active', true)->pluck('name', 'Id'))
-                ->searchable()
-                ->sortable()->hideFromIndex(),
+                ->hideFromIndex()
+                ->hideFromDetail(),
 
             Select::make('Mail Setting', 'mail_setting_id')
-                ->options(\App\Models\MailSetting::pluck('Username', 'Id'))
+                ->options(\App\Models\MailSetting::where('Active', true)->pluck('FromEmail', 'Id'))
                 ->searchable()
-                ->sortable()->hideFromIndex(),
+                ->sortable()
+                ->hideFromIndex()
+                ->hideFromDetail(),
 
 
             BelongsTo::make('External Connection', 'externalConnection', ExternalConnection::class)->searchable()->sortable()->display('name')->hideWhenCreating()->hideWhenUpdating(),
-            BelongsTo::make('Shop Credential', 'shopCredential', Credential::class)->searchable()->display('Name')->readonly()->hideWhenCreating()->hideWhenUpdating(),
+            BelongsTo::make('Shop Credential', 'shopCredential', Credential::class)->searchable()->display('Name')->hideWhenCreating()->hideWhenUpdating(),
             BelongsTo::make('Payment Provider Credential', 'paymentProviderCredential', Credential::class)->searchable()->display('Name')->readonly()->hideWhenCreating()->hideWhenUpdating(),
-            BelongsTo::make('Mail setting', 'mailSetting', MailSetting::class)->searchable()->display('Username')->readonly()->hideWhenCreating()->hideWhenUpdating(),
+            BelongsTo::make('Mail setting', 'mailSetting', MailSetting::class)->searchable()->display('FromEmail')->readonly()->hideWhenCreating()->hideWhenUpdating(),
 
         ];
     }

@@ -99,4 +99,12 @@ class MailSetting extends Resource
     {
         return [];
     }
+
+
+    // public function menu(Request $request)
+    // {
+    //     return parent::menu($request)->withBadge(function () {
+    //         return static::$model::where('Active', true)->count();
+    //     });
+    // }
 }

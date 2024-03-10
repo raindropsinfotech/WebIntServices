@@ -96,4 +96,17 @@ class ExternalProduct extends Resource
     {
         return [];
     }
+
+    /**
+     * Get the menu that should represent the resource.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Laravel\Nova\Menu\MenuItem
+     */
+    // public function menu(Request $request)
+    // {
+    //     return parent::menu($request)->withBadge(function () {
+    //         return static::$model::count();
+    //     });
+    // }
 }
