@@ -10,6 +10,7 @@ use Illuminate\Validation\Rules;
 use Laravel\Nova\Fields\BelongsToMany;
 use Laravel\Nova\Fields\Boolean;
 use Laravel\Nova\Fields\Gravatar;
+use Laravel\Nova\Fields\HasMany;
 use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Fields\Password;
 use Laravel\Nova\Fields\Select;
@@ -74,6 +75,8 @@ class User extends Resource
             // BelongsToMany::make('Roles', 'roles', Role::class),
 
             // Select::make('Roles')->options(\Spatie\Permission\Models\Role::pluck('name', 'name')),
+            HasMany::make('permissions'),
+            HasMany::make('roles'),
         ];
     }
 
@@ -125,6 +128,9 @@ class User extends Resource
             (new AssignPermissions)->canSee(function ($request) {
                 return true;
             }),
+
+            Actions\RemovePermission::make(),
+
         ];
     }
 
