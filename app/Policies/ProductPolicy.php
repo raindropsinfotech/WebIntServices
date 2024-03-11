@@ -13,7 +13,7 @@ class ProductPolicy
      */
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->can('view products');
     }
 
     /**
@@ -21,7 +21,7 @@ class ProductPolicy
      */
     public function view(User $user, Product $product): bool
     {
-        return true;
+        return $user->can('view products');
     }
 
     /**
