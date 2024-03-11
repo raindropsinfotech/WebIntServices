@@ -2,26 +2,26 @@
 
 namespace App\Policies;
 
-use App\Models\Order;
+use App\Models\ExternalProduct;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
 
-class OrderPolicy
+class ExternalProductPolicy
 {
     /**
      * Determine whether the user can view any models.
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view orders');
+        return $user->can('view externalProducts');
     }
 
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, Order $order): bool
+    public function view(User $user, ExternalProduct $externalProduct): bool
     {
-        return $user->can('view orders');
+        return $user->can('view externalProducts');
     }
 
     /**
@@ -29,21 +29,21 @@ class OrderPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('manage orders');
+        return $user->can('manage externalProducts');
     }
 
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, Order $order): bool
+    public function update(User $user, ExternalProduct $externalProduct): bool
     {
-        return $user->can('manage orders');
+        return $user->can('manage externalProducts');
     }
 
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, Order $order): bool
+    public function delete(User $user, ExternalProduct $externalProduct): bool
     {
         return $user->hasRole('admin');
     }
@@ -51,7 +51,7 @@ class OrderPolicy
     /**
      * Determine whether the user can restore the model.
      */
-    public function restore(User $user, Order $order): bool
+    public function restore(User $user, ExternalProduct $externalProduct): bool
     {
         return $user->hasRole('admin');
     }
@@ -59,7 +59,7 @@ class OrderPolicy
     /**
      * Determine whether the user can permanently delete the model.
      */
-    public function forceDelete(User $user, Order $order): bool
+    public function forceDelete(User $user, ExternalProduct $externalProduct): bool
     {
         return $user->hasRole('admin');
     }

@@ -13,7 +13,7 @@ class NotificationPolicy
      */
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->can('view notifications');
     }
 
     /**
@@ -21,7 +21,7 @@ class NotificationPolicy
      */
     public function view(User $user, Notification $notification): bool
     {
-        return true;
+        return $user->can('view notifications');
     }
 
     /**
@@ -29,7 +29,7 @@ class NotificationPolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        return $user->hasRole('admin');
     }
 
     /**
@@ -38,7 +38,7 @@ class NotificationPolicy
     public function update(User $user, Notification $notification): bool
     {
         //return $user->hasRole('admin');
-        return true;
+        return $user->can('manage notifications');
     }
 
     /**

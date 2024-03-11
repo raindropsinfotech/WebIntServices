@@ -13,7 +13,7 @@ class OrderItemPolicy
      */
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->can('view orderItems');
     }
 
     /**
@@ -21,7 +21,7 @@ class OrderItemPolicy
      */
     public function view(User $user, OrderItem $orderItem): bool
     {
-        return true;
+        return $user->can('view orderItems');
     }
 
     /**
@@ -29,7 +29,7 @@ class OrderItemPolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasRole('admin');
+        return $user->can('manage orderItems');
     }
 
     /**
@@ -37,7 +37,7 @@ class OrderItemPolicy
      */
     public function update(User $user, OrderItem $orderItem): bool
     {
-        return true;
+        return $user->can('manage orderItems');
     }
 
     /**
