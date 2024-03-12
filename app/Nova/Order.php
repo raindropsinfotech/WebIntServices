@@ -2,14 +2,18 @@
 
 namespace App\Nova;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Laravel\Nova\Fields\Badge;
+use Laravel\Nova\Fields\BelongsTo;
 use Laravel\Nova\Fields\Currency;
+use Laravel\Nova\Fields\Date;
 use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Http\Requests\NovaRequest;
 use Laravel\Nova\Fields\HasMany;
 use Laravel\Nova\Fields\DateTime;
+use Laravel\Nova\Fields\Email;
 use Laravel\Nova\Fields\Number;
 use Laravel\Nova\Fields\Select;
 
@@ -55,18 +59,19 @@ class Order extends Resource
     {
         return [
             ID::make('id', 'Id')->readonly()->sortable(),
-            Text::make('shopOrderNumber', 'ShopOrderNumber'),
+            Text::make('shopOrderNumber', 'ShopOrderNumber')->required(),
             Select::make('status', 'Status')->options([
                 0 => 'New',
                 1 => 'PartiallyCompleted',
                 2 => 'Completed',
                 3 => 'Cancelled'
-            ])->displayUsingLabels()->filterable(),
-            Text::make('customerName', 'CustomerName'),
-            Text::make('customerEmail', 'CustomerEmail'),
-            DateTime::make('created_at', 'CreatedAt')->readonly(),
-            DateTime::make('updated_at', 'UpdatedAt')->readonly(),
-            Text::make('external_connection_id')->nullable(),
+            ])->displayUsingLabels()->filterable()->hideWhenCreating()->default(0),
+            Text::make('customerName', 'CustomerName')->required(),
+            Email::make('customerEmail', 'CustomerEmail')->required(),
+            DateTime::make('created_at', 'CreatedAt')->readonly()->onlyOnDetail(),
+            DateTime::make('updated_at', 'UpdatedAt')->readonly()->onlyOnDetail(),
+            Select::make('external_connection_id')->options(\App\Models\ExternalConnection::pluck('name'))->required(),
+            // BelongsTo::make('external_connection_id', 'externalConnection', \App\Models\ExternalConnection::class)->display('name'),
             HasMany::make('Order Items', 'orderItems', OrderItem::class),
             Badge::make('PaymentStatus', 'PaymentStatus')
                 ->withIcons()
@@ -75,8 +80,20 @@ class Order extends Resource
                     '1' => 'danger',
                     '2' => 'success',
                     '3' => 'warning'
-                ]),
+                ])->default(0),
             Number::make('total', 'OrderTotal'),
+            Select::make('Payment Status', 'PaymentStatus')
+                ->options([
+                    0 => 'Unpaid',
+                    1 => 'PartiallyPaid',
+                    2 => 'Paid',
+                    3 => 'Refunded'
+                ])
+                ->default(0)
+                ->onlyOnForms()
+                ->hideWhenCreating(),
+            Date::make('Order Time', 'OrderDateTime')
+                ->default(Carbon::today()),
         ];
     }
 

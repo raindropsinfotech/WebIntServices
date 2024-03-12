@@ -63,16 +63,27 @@ class Order extends Model
             2 => 'Completed',
             3 => 'Cancelled'
         ],
+        'PaymentStatus' => [
+            0 => 'Unpaid',
+            1 => 'PartiallyPaid',
+            2 => 'Paid',
+            3 => 'Refunded'
+        ],
     ];
 
     public function externalConnection()
     {
-        return $this->belongsTo(ExternalConnection::class);
+        return $this->belongsTo(ExternalConnection::class, 'external_connection_id', 'id');
     }
 
     protected $attributes = [
         'Status' => 0,
         'PaymentStatus' => 0,
         'ShopSystem' => 0 // in next version this will be obsolete as we will use external_connection
+    ];
+
+    //Casts of the model dates
+    protected $casts = [
+        'OrderDateTime' => 'date'
     ];
 }
