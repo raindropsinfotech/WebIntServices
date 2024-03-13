@@ -9,7 +9,10 @@ use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Fields\DateTime;
 use Laravel\Nova\Fields\BelongsTo;
+use Laravel\Nova\Fields\Number as FieldsNumber;
+use Laravel\Nova\Fields\Select;
 use Laravel\Nova\Http\Requests\NovaRequest;
+use Number;
 
 class OrderItem extends Resource
 {
@@ -33,8 +36,21 @@ class OrderItem extends Resource
      * @var array
      */
     public static $search = [
-        'id',
+        'id', 'order.ShopOrderNumber',
     ];
+
+    /**
+     * Get the default ordering for the resource.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return array
+     */
+    // public static function defaultOrder(NovaRequest $request)
+    // {
+    //     return [
+    //         ['Id', 'asc'], // Default sorting by ID in ascending order
+    //     ];
+    // }
 
     /**
      * The visual style used for the table. Available options are 'tight' and 'default'.
@@ -53,14 +69,19 @@ class OrderItem extends Resource
         return [
             ID::make('id', 'Id')->sortable(),
             Text::make('externalId', 'ExrenalId'),
-            BelongsTo::make('Product', 'product', Product::class)->display('FullName'),
+            Select::make('Product', 'ProductId')
+                ->options(\App\Models\Product::where('ProductType', 0)->pluck('FullName', 'Id'))->onlyOnForms(),
+
+            BelongsTo::make('Product', 'product', Product::class)->display('FullName')
+                ->exceptOnForms(),
             BelongsTo::make('Order', 'order', Order::class)->display('ShopOrderNumber')->readonly(),
-            Text::make('adults', 'Adults'),
+            FieldsNumber::make('adults', 'Adults'),
             Text::make('children', 'Children'),
-            DateTime::make('serviceDateTime', 'ServiceDateTime'),
+            DateTime::make('serviceDateTime', 'ServiceDateTime')->required(),
             Boolean::make('isProcessed', 'IsProcessed'),
-            DateTime::make('created_at', 'CreatedAt')->readonly(),
-            DateTime::make('updated_at', 'UpdatedAt')->readonly(),
+            Boolean::make('Pospond Delivery', 'PostpondDelivery'),
+            DateTime::make('created_at', 'CreatedAt')->readonly()->onlyOnDetail(),
+            DateTime::make('updated_at', 'UpdatedAt')->readonly()->onlyOnDetail(),
 
         ];
     }
