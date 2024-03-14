@@ -13,7 +13,7 @@ class ExternalConnectionMappingPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasRole('admin');
+        return $user->hasRole('view externalConnectionMapping');
     }
 
     /**
@@ -21,7 +21,7 @@ class ExternalConnectionMappingPolicy
      */
     public function view(User $user, ExternalConnectionMapping $externalConnectionMapping): bool
     {
-        return $user->hasRole('admin');
+        return $user->hasRole('view externalConnectionMapping');
     }
 
     /**
@@ -29,7 +29,7 @@ class ExternalConnectionMappingPolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasRole('admin');
+        return $user->hasRole('manage externalConnectionMapping');
     }
 
     /**
@@ -37,7 +37,7 @@ class ExternalConnectionMappingPolicy
      */
     public function update(User $user, ExternalConnectionMapping $externalConnectionMapping): bool
     {
-        return $user->hasRole('admin');
+        return $user->hasRole('manage externalConnectionMapping');
     }
 
     /**

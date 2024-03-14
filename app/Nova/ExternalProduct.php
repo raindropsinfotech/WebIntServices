@@ -48,7 +48,7 @@ class ExternalProduct extends Resource
             Text::make('external_product_id'),
             BelongsTo::make('external_connection_id', 'externalConnection', ExternalConnection::class)->display('name'),
             Boolean::make('is_active'),
-            BelongsToMany::make('Products', 'products', Product::class)->display('FullName'),
+            BelongsToMany::make('Products', 'products', Product::class)->searchable()->filterable()->display('FullName'),
 
         ];
     }

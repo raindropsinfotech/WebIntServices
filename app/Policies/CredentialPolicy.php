@@ -13,7 +13,7 @@ class CredentialPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasRole('admin');
+        return $user->hasRole('view credentials');
     }
 
     /**
@@ -21,7 +21,7 @@ class CredentialPolicy
      */
     public function view(User $user, Credential $credential): bool
     {
-        return $user->hasRole('admin');
+        return $user->hasRole('view credentials');
     }
 
     /**
@@ -29,7 +29,7 @@ class CredentialPolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasRole('admin');
+        return $user->hasRole('manage credentials');
     }
 
     /**
@@ -37,7 +37,7 @@ class CredentialPolicy
      */
     public function update(User $user, Credential $credential): bool
     {
-        return $user->hasRole('admin');
+        return $user->hasRole('manage credentials');
     }
 
     /**

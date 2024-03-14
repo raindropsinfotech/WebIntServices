@@ -29,6 +29,17 @@ class RolesAndPermissionsSeeder extends Seeder
         Permission::create(['name' => 'manage externalProducts']);
         Permission::create(['name' => 'view notifications']);
         Permission::create(['name' => 'manage notifications']);
+        Permission::create(['name' => 'view externalConnection']);
+        Permission::create(['name' => 'manage externalConnection']);
+        Permission::create(['name' => 'view credentials']);
+        Permission::create(['name' => 'manage credentials']);
+        Permission::create(['name' => 'view emailTemplete']);
+        Permission::create(['name' => 'manage emailTemplete']);
+        Permission::create(['name' => 'view externalConnectionMapping']);
+        Permission::create(['name' => 'manage externalConnectionMapping']);
+        Permission::create(['name' => 'view mailSettings']);
+        Permission::create(['name' => 'manage mailSettings']);
+
 
         //create roles
 

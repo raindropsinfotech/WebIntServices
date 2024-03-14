@@ -13,7 +13,7 @@ class ExternalConnectionPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasRole('admin');
+        return $user->can('view externalConnection');
     }
 
     /**
@@ -21,7 +21,7 @@ class ExternalConnectionPolicy
      */
     public function view(User $user, ExternalConnection $externalConnection): bool
     {
-        return $user->hasRole('admin');
+        return $user->can('view externalConnection');
     }
 
     /**
@@ -29,7 +29,7 @@ class ExternalConnectionPolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasRole('admin');
+        return $user->can('manage externalConnection');
     }
 
     /**
@@ -37,7 +37,7 @@ class ExternalConnectionPolicy
      */
     public function update(User $user, ExternalConnection $externalConnection): bool
     {
-        return $user->hasRole('admin');
+        return $user->can('manage externalConnection');
     }
 
     /**

@@ -13,7 +13,7 @@ class EmailTemplatePolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasRole('admin');
+        return $user->hasRole('view emailTemplete');
     }
 
     /**
@@ -21,7 +21,7 @@ class EmailTemplatePolicy
      */
     public function view(User $user, EmailTemplate $emailTemplate): bool
     {
-        return $user->hasRole('admin');
+        return $user->hasRole('view emailTemplete');
     }
 
     /**
@@ -29,7 +29,7 @@ class EmailTemplatePolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasRole('admin');
+        return $user->hasRole('manage emailTemplete');
     }
 
     /**
@@ -37,7 +37,7 @@ class EmailTemplatePolicy
      */
     public function update(User $user, EmailTemplate $emailTemplate): bool
     {
-        return $user->hasRole('admin');
+        return $user->hasRole('manage emailTemplete');
     }
 
     /**

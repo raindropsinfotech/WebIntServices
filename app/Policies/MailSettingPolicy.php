@@ -13,7 +13,7 @@ class MailSettingPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasRole('admin');
+        return $user->hasRole('view mailSettings');
     }
 
     /**
@@ -21,7 +21,7 @@ class MailSettingPolicy
      */
     public function view(User $user, MailSetting $mailSetting): bool
     {
-        return $user->hasRole('admin');
+        return $user->hasRole('view mailSettings');
     }
 
     /**
@@ -29,7 +29,7 @@ class MailSettingPolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasRole('admin');
+        return $user->hasRole('manage mailSettings');
     }
 
     /**
@@ -37,7 +37,7 @@ class MailSettingPolicy
      */
     public function update(User $user, MailSetting $mailSetting): bool
     {
-        return $user->hasRole('admin');
+        return $user->hasRole('manage mailSettings');
     }
 
     /**
