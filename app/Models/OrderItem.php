@@ -36,6 +36,7 @@ class OrderItem extends Model
      */
     protected $casts = [
         'ServiceDateTime' => 'datetime', // Adjust the column name as needed
+        'ProcessDateTime' => 'datetime',
     ];
 
     protected $attributes = [

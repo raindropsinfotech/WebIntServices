@@ -19,6 +19,11 @@ class ExternalConnection extends Resource
      */
     public static $model = \App\Models\ExternalConnection::class;
 
+    public static function uriKey()
+    {
+        return 'external_connections';
+    }
+
     /**
      * The single value that should be used to represent the resource when being displayed.
      *

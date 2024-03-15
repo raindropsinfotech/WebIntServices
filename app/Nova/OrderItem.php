@@ -9,6 +9,7 @@ use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Fields\DateTime;
 use Laravel\Nova\Fields\BelongsTo;
+use Laravel\Nova\Fields\Date;
 use Laravel\Nova\Fields\Number as FieldsNumber;
 use Laravel\Nova\Fields\Select;
 use Laravel\Nova\Http\Requests\NovaRequest;
@@ -68,20 +69,21 @@ class OrderItem extends Resource
     {
         return [
             ID::make('id', 'Id')->sortable(),
-            Text::make('externalId', 'ExrenalId'),
+            Boolean::make('Processed', 'IsProcessed')->filterable(),
+            BelongsTo::make('Order', 'order', Order::class)->display('ShopOrderNumber')->readonly(),
+            Text::make('externalId', 'ExrenalId')->showOnDetail(),
             Select::make('Product', 'ProductId')
                 ->options(\App\Models\Product::where('ProductType', 0)->pluck('FullName', 'Id'))->onlyOnForms(),
 
             BelongsTo::make('Product', 'product', Product::class)->display('FullName')
                 ->exceptOnForms(),
-            BelongsTo::make('Order', 'order', Order::class)->display('ShopOrderNumber')->readonly(),
-            FieldsNumber::make('adults', 'Adults'),
-            Text::make('children', 'Children'),
-            DateTime::make('serviceDateTime', 'ServiceDateTime')->required(),
-            Boolean::make('isProcessed', 'IsProcessed'),
+            FieldsNumber::make('Adults', 'Adults'),
+            Text::make('Kids', 'Children'),
+            Date::make('ServiceDate', 'ServiceDateTime')->filterable()->required(),
             Boolean::make('Pospond Delivery', 'PostpondDelivery'),
             DateTime::make('created_at', 'CreatedAt')->readonly()->onlyOnDetail(),
             DateTime::make('updated_at', 'UpdatedAt')->readonly()->onlyOnDetail(),
+            DateTime::make('ProcessDateTime', 'ProcessDateTime')->filterable(),
 
         ];
     }
@@ -106,7 +108,7 @@ class OrderItem extends Resource
     public function filters(NovaRequest $request)
     {
         return [
-            new OrderItemStatus(),
+            // new OrderItemStatus(),
         ];
     }
 

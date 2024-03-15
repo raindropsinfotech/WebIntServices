@@ -39,7 +39,7 @@ class Order extends Resource
      * @var array
      */
     public static $search = [
-        'id', 'shopOrderNumber',
+        'id', 'shopOrderNumber', 'CustomerEmail'
     ];
 
     /**
@@ -70,8 +70,9 @@ class Order extends Resource
             Email::make('customerEmail', 'CustomerEmail')->required(),
             DateTime::make('created_at', 'CreatedAt')->readonly()->onlyOnDetail(),
             DateTime::make('updated_at', 'UpdatedAt')->readonly()->onlyOnDetail(),
-            Select::make('external_connection_id')->options(\App\Models\ExternalConnection::pluck('name'))->required(),
-            // BelongsTo::make('external_connection_id', 'externalConnection', \App\Models\ExternalConnection::class)->display('name'),
+            Select::make('ExternalConnection', 'external_connection_id')->options(\App\Models\ExternalConnection::pluck('name', 'id'))->required()->onlyOnForms(),
+            // BelongsTo::make('external_connection_id', 'externalConnection', \App\Models\ExternalConnection::class)->display('name')->exceptOnForms(),
+            BelongsTo::make('ExternalConnection', 'externalConnection')->display('name')->exceptOnForms()->filterable(),
             HasMany::make('Order Items', 'orderItems', OrderItem::class),
             Badge::make('PaymentStatus', 'PaymentStatus')
                 ->withIcons()
@@ -91,6 +92,7 @@ class Order extends Resource
                 ])
                 ->default(0)
                 ->onlyOnForms()
+                ->filterable()
                 ->hideWhenCreating(),
             Date::make('Order Time', 'OrderDateTime')
                 ->default(Carbon::today()),
