@@ -79,11 +79,19 @@ class OrderItem extends Resource
                 ->exceptOnForms(),
             FieldsNumber::make('Adults', 'Adults'),
             Text::make('Kids', 'Children'),
-            Date::make('ServiceDate', 'ServiceDateTime')->filterable()->required(),
+            Date::make('ServiceDate', 'ServiceDateTime')
+                ->displayUsing(function ($value) {
+                    return $value->format('d M Y'); // Customize the date format as per your preference
+                })
+                ->filterable()->required(),
             Boolean::make('Pospond Delivery', 'PostpondDelivery'),
             DateTime::make('created_at', 'CreatedAt')->readonly()->onlyOnDetail(),
             DateTime::make('updated_at', 'UpdatedAt')->readonly()->onlyOnDetail(),
-            DateTime::make('ProcessDateTime', 'ProcessDateTime')->filterable(),
+            DateTime::make('ProcessDateTime', 'ProcessDateTime')->filterable()
+                ->displayUsing(function ($value) {
+                    if ($value)
+                        return $value->format('d M Y H m'); // Customize the date format as per your preference
+                }),
 
         ];
     }
