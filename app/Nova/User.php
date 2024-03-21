@@ -77,6 +77,7 @@ class User extends Resource
             // Select::make('Roles')->options(\Spatie\Permission\Models\Role::pluck('name', 'name')),
             HasMany::make('permissions'),
             HasMany::make('roles'),
+            HasMany::make('audits', 'audits', Audit::class),
         ];
     }
 
