@@ -96,6 +96,7 @@ class Order extends Resource
                 ->hideWhenCreating(),
             Date::make('Order Time', 'OrderDateTime')
                 ->default(Carbon::today()),
+            HasMany::make('audits', 'audits', Audit::class),
         ];
     }
 
