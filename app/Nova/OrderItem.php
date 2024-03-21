@@ -10,6 +10,7 @@ use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Fields\DateTime;
 use Laravel\Nova\Fields\BelongsTo;
 use Laravel\Nova\Fields\Date;
+use Laravel\Nova\Fields\HasMany;
 use Laravel\Nova\Fields\Number as FieldsNumber;
 use Laravel\Nova\Fields\Select;
 use Laravel\Nova\Http\Requests\NovaRequest;
@@ -92,7 +93,7 @@ class OrderItem extends Resource
                     if ($value)
                         return $value->format('d M Y H m'); // Customize the date format as per your preference
                 }),
-
+            HasMany::make('audits', 'audits', Audit::class),
         ];
     }
 
