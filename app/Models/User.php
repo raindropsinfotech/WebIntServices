@@ -47,9 +47,4 @@ class User extends Authenticatable implements Auditable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
-
-    public function getAudits()
-    {
-        $this->audits()->with('user')->get();
-    }
 }

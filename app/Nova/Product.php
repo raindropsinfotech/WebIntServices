@@ -5,6 +5,7 @@ namespace App\Nova;
 use App\Nova\Metrics\ProductsSold;
 use Illuminate\Http\Request;
 use Laravel\Nova\Fields\BelongsToMany;
+use Laravel\Nova\Fields\HasMany;
 use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Fields\Select;
 use Laravel\Nova\Fields\Text;
@@ -52,6 +53,7 @@ class Product extends Resource
                 1 => 'Combo'
             ])->displayUsingLabels()->filterable(),
             BelongsToMany::make('ExternalProducts', 'externalProducts', ExternalProduct::class),
+            HasMany::make('audits', 'audits', Audit::class),
         ];
     }
 
