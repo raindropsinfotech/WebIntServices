@@ -2,23 +2,23 @@
 
 namespace App\Nova;
 
-use App\Nova\Metrics\ProductsSold;
 use Illuminate\Http\Request;
-use Laravel\Nova\Fields\BelongsToMany;
-use Laravel\Nova\Fields\HasMany;
+use Laravel\Nova\Fields\DateTime;
+use Laravel\Nova\Fields\HasOne;
 use Laravel\Nova\Fields\ID;
-use Laravel\Nova\Fields\Select;
+use Laravel\Nova\Fields\KeyValue;
+use Laravel\Nova\Fields\Markdown;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Http\Requests\NovaRequest;
 
-class Product extends Resource
+class Audit extends Resource
 {
     /**
      * The model the resource corresponds to.
      *
-     * @var class-string<\App\Models\Product>
+     * @var class-string<\App\Models\Audit>
      */
-    public static $model = \App\Models\Product::class;
+    public static $model =  \OwenIt\Auditing\Models\Audit::class;
 
     /**
      * The single value that should be used to represent the resource when being displayed.
@@ -33,7 +33,7 @@ class Product extends Resource
      * @var array
      */
     public static $search = [
-        'id', 'name', 'fullName',
+        'id',
     ];
 
     /**
@@ -45,15 +45,18 @@ class Product extends Resource
     public function fields(NovaRequest $request)
     {
         return [
-            ID::make('id', 'Id')->sortable(),
-            Text::make('name', 'Name'),
-            Text::make('fullName', 'FullName'),
-            Select::make('productType', 'ProductType')->options([
-                0 => 'Single',
-                1 => 'Combo'
-            ])->displayUsingLabels()->filterable(),
-            BelongsToMany::make('ExternalProducts', 'externalProducts', ExternalProduct::class),
-            HasMany::make('audits', 'audits', Audit::class),
+            ID::make()->sortable(),
+            Text::make('event'),
+            // Markdown::make('old_values'),
+            // Markdown::make('new_values'),
+            // Text::make('user_agent'),
+            // Text::make('tags'),
+            Text::make('user_id'),
+            DateTime::make('created_at'),
+            HasOne::make('user')->display('name'),
+            KeyValue::make('old_values')->hideFromIndex(),
+            KeyValue::make('new_values')->hideFromIndex(),
+
         ];
     }
 
@@ -65,9 +68,7 @@ class Product extends Resource
      */
     public function cards(NovaRequest $request)
     {
-        return [
-            ProductsSold::make()->onlyOnDetail()->width('1/2')
-        ];
+        return [];
     }
 
     /**

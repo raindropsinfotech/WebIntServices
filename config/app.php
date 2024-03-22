@@ -164,6 +164,7 @@ return [
          * Application Service Providers...
          */
         // \Barryvdh\Debugbar\ServiceProvider::class,
+        \OwenIt\Auditing\AuditingEventServiceProvider::class,
         App\Providers\AppServiceProvider::class,
         App\Providers\AuthServiceProvider::class,
         // App\Providers\BroadcastServiceProvider::class,
