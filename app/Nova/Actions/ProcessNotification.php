@@ -168,7 +168,7 @@ class ProcessNotification extends Action
             return;
         }
 
-        $credentilasMapping = \App\Models\CredentialExternalConnectionMapping::where('external_connection_id', $external_connection->id)->first();
+        $credentilasMapping = \App\Models\ExternalConnectionMapping::where('external_connection_id', $external_connection->id)->first();
         if (!isset($credentilasMapping)) {
             $notification->status = 'processed_error';
             $notification->result = 'No  external connection - credentila mapping found for External_Connection (' . $external_connection->name . ')';
@@ -179,7 +179,7 @@ class ProcessNotification extends Action
         $notification->result = 'ExternalConnection-Credential mapping found!';
         $notification->save();
 
-        $credentials = $credentilasMapping->credential;
+        $credentials = \App\Models\Credential::where('Id', $credentilasMapping->shop_credential_id)->first();
 
         if (!isset($credentials)) {
             $notification->status = 'processed_error';
