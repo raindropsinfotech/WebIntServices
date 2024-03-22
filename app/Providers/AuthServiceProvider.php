@@ -5,6 +5,7 @@ namespace App\Providers;
 // use Illuminate\Support\Facades\Gate;
 
 use App\Models\Order;
+use App\Policies\AuditPolicy;
 use App\Policies\OrderPolicy;
 use App\Policies\PermissionPolicy;
 use App\Policies\RolePolicy;
@@ -23,6 +24,7 @@ class AuthServiceProvider extends ServiceProvider
         Order::class => OrderPolicy::class,
         Permission::class => PermissionPolicy::class,
         Role::class => RolePolicy::class,
+        \OwenIt\Auditing\Models\Audit::class => AuditPolicy::class,
     ];
 
     /**
