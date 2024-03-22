@@ -5,6 +5,7 @@ namespace App\Nova;
 use App\Nova\Actions\ProcessNotification;
 use Illuminate\Http\Request;
 use Laravel\Nova\Fields\Code;
+use Laravel\Nova\Fields\DateTime;
 use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Fields\Markdown;
 use Laravel\Nova\Fields\Select;
@@ -51,7 +52,8 @@ class Notification extends Resource
             Markdown::make('payload')->readonly(),
             Select::make('status')->options(['new' => 'new', 'processed_ok' => 'processed_ok', 'processed_error' => 'processed_error', 'ignored' => 'ignored']),
             Markdown::make('result'),
-            Text::make('order_id')->readonly()
+            Text::make('order_id')->readonly(),
+            DateTime::make('created_at'),
         ];
     }
 
