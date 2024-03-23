@@ -47,4 +47,16 @@ class Product extends Model implements Auditable
             1 => 'Combo'
         ],
     ];
+
+    protected $attributes = [
+        'OrderProcessingType' => 0,
+        'RaynaTourId' => 0,
+        'RaynaTourOptionId' => 0,
+        'RaynaContractId' => 0,
+        'RaynaAdultPrice' => 0,
+        'RaynaChildPrice' => 0,
+        'GatePrice' => 0,
+        'CostINR' => 0,
+        'MinumumSellingPriceAED' => 0
+    ];
 }

@@ -48,9 +48,9 @@ class Notification extends Resource
     {
         return [
             ID::make()->sortable(),
-            Text::make('source')->filterable()->readonly(),
+            Text::make('source')->readonly()->filterable(),
             Markdown::make('payload')->readonly(),
-            Select::make('status')->options(['new' => 'new', 'processed_ok' => 'processed_ok', 'processed_error' => 'processed_error', 'ignored' => 'ignored']),
+            Select::make('status')->options(['new' => 'new', 'processed_ok' => 'processed_ok', 'processed_error' => 'processed_error', 'ignored' => 'ignored'])->filterable(),
             Markdown::make('result'),
             Text::make('order_id')->readonly(),
             DateTime::make('created_at'),
