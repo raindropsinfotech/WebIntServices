@@ -2,6 +2,7 @@
 
 namespace App\Nova;
 
+use App\Nova\Actions\ProcessManually;
 use App\Nova\Actions\ProcessNow;
 use App\Nova\Filters\OrderItemStatus;
 use Illuminate\Http\Request;
@@ -143,6 +144,7 @@ class OrderItem extends Resource
     {
         return [
             ProcessNow::make(),
+            // ProcessManually::make(),
         ];
     }
 
