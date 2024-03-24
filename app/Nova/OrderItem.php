@@ -2,6 +2,7 @@
 
 namespace App\Nova;
 
+use App\Nova\Actions\ProcessNow;
 use App\Nova\Filters\OrderItemStatus;
 use Illuminate\Http\Request;
 use Laravel\Nova\Fields\Boolean;
@@ -82,7 +83,7 @@ class OrderItem extends Resource
             Text::make('Kids', 'Children'),
             Date::make('ServiceDate', 'ServiceDateTime')
                 ->displayUsing(function ($value) {
-                    return $value->format('d M Y'); // Customize the date format as per your preference
+                    return $value->format('D, d M Y H:i:s'); // Customize the date format as per your preference
                 })
                 ->filterable()->required(),
             Boolean::make('Pospond Delivery', 'PostpondDelivery'),
@@ -91,7 +92,7 @@ class OrderItem extends Resource
             DateTime::make('ProcessDateTime', 'ProcessDateTime')->filterable()
                 ->displayUsing(function ($value) {
                     if ($value)
-                        return $value->format('d M Y H m'); // Customize the date format as per your preference
+                        return $value->format('D, d M Y H:i:s'); // Customize the date format as per your preference
                 }),
             HasMany::make('audits', 'audits', Audit::class),
         ];
@@ -140,7 +141,9 @@ class OrderItem extends Resource
      */
     public function actions(NovaRequest $request)
     {
-        return [];
+        return [
+            ProcessNow::make(),
+        ];
     }
 
     /**
