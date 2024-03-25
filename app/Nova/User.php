@@ -4,6 +4,7 @@ namespace App\Nova;
 
 use App\Nova\Actions\AssignPermissions;
 use App\Nova\Actions\AssignRole;
+use App\Nova\Actions\RemoveRole;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rules;
@@ -131,6 +132,7 @@ class User extends Resource
             }),
 
             Actions\RemovePermission::make(),
+            RemoveRole::make(),
 
         ];
     }
