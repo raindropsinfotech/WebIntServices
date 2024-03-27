@@ -58,7 +58,8 @@ class Notification extends Resource
                     'new' => 'warning',
                     'processed_ok' => 'success',
                     'processed_error' => 'danger',
-                ]),
+                ])
+                ->filterable(),
             Markdown::make('result'),
             Text::make('order_id')->readonly(),
             DateTime::make('created_at'),
