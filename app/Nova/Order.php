@@ -2,6 +2,7 @@
 
 namespace App\Nova;
 
+use App\Nova\Actions\CheckPayment;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Laravel\Nova\Fields\Badge;
@@ -97,6 +98,7 @@ class Order extends Resource
             Date::make('Order Time', 'OrderDateTime')
                 ->default(Carbon::today()),
             HasMany::make('audits', 'audits', Audit::class),
+            Text::make('PaymentReference', 'PaymentReference')->readonly(),
         ];
     }
 
@@ -141,7 +143,9 @@ class Order extends Resource
      */
     public function actions(NovaRequest $request)
     {
-        return [];
+        return [
+            CheckPayment::make(),
+        ];
     }
 
     /**
