@@ -88,7 +88,8 @@ class ProcessNotification extends Action
         }
 
         $customerName =  $payloadArray->customer->firstName . ' ' . $payloadArray->customer->firstName;
-        $order = $this->GetOrder($external_connection->id, $payloadArray->confirmationCode, $payloadArray->totalPrice, date("Y-m-d H:i:s", $payloadArray->creationDate / 1000), $payloadArray->customer->email, $customerName, $payloadArray->customer->phoneNumber);
+        $payment_reference = $payloadArray?->customerPayments[0]?->authorizationCode;
+        $order = $this->GetOrder($external_connection->id, $payloadArray->confirmationCode, $payloadArray->totalPaid, date("Y-m-d H:i:s", $payloadArray->creationDate / 1000), $payloadArray->customer->email, $customerName, $payloadArray->customer->phoneNumber, $payment_reference);
 
         if (!isset($order)) {
             $notification->status = 'processed_error';
@@ -204,7 +205,7 @@ class ProcessNotification extends Action
 
         $ecwidResponse = json_decode($ecwidResponseData);
 
-        $order = $this->getOrder($external_connection->id, $ecwidResponse->id, $ecwidResponse->total, date("y-m-d h:i:s", $ecwidResponse->createTimestamp), $ecwidResponse->email, $ecwidResponse->billingPerson->name, $ecwidResponse->billingPerson->phone);
+        $order = $this->getOrder($external_connection->id, $ecwidResponse->id, $ecwidResponse->total, date("y-m-d h:i:s", $ecwidResponse->createTimestamp), $ecwidResponse->email, $ecwidResponse->billingPerson->name, $ecwidResponse->billingPerson->phone, $ecwidResponse->externalTransactionId);
         if (!isset($order)) {
             $notification->status = 'processed_error';
             $notification->result = 'Unable to create order.';
@@ -294,7 +295,7 @@ class ProcessNotification extends Action
         return $response->getBody();
     }
 
-    private function getOrder($external_connection_id, $shopOrderNumber,  $orderTotal, $orderDate, $customerEmail, $customerName, $customerPhone)
+    private function getOrder($external_connection_id, $shopOrderNumber,  $orderTotal, $orderDate, $customerEmail, $customerName, $customerPhone, $payment_reference)
     {
         $order = \App\Models\Order::where('ShopOrderNumber', $shopOrderNumber)
             ->where('external_connection_id', $external_connection_id)->first();
@@ -308,6 +309,7 @@ class ProcessNotification extends Action
         $order->OrderDateTime = $orderDate; //$this->getDateFromTimestamp($payloadArray->creationDate);
         $order->OrderTotal = $orderTotal;
         $order->external_connection_id = $external_connection_id;
+        $order->PaymentReference = $payment_reference;
         $order->save();
 
         return $order;
