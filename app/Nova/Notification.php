@@ -35,7 +35,7 @@ class Notification extends Resource
      * @var array
      */
     public static $search = [
-        'id',
+        'id', 'source', 'order_id',
     ];
 
     /**
