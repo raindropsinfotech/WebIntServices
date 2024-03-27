@@ -4,6 +4,7 @@ namespace App\Nova;
 
 use App\Nova\Actions\ProcessNotification;
 use Illuminate\Http\Request;
+use Laravel\Nova\Fields\Badge;
 use Laravel\Nova\Fields\Code;
 use Laravel\Nova\Fields\DateTime;
 use Laravel\Nova\Fields\ID;
@@ -50,7 +51,14 @@ class Notification extends Resource
             ID::make()->sortable(),
             Text::make('source')->readonly()->filterable(),
             Markdown::make('payload')->readonly(),
-            Select::make('status')->options(['new' => 'new', 'processed_ok' => 'processed_ok', 'processed_error' => 'processed_error', 'ignored' => 'ignored'])->filterable(),
+            // Select::make('status')->options(['new' => 'new', 'processed_ok' => 'processed_ok', 'processed_error' => 'processed_error', 'ignored' => 'ignored'])->filterable(),
+            Badge::make('status')
+                ->withIcons()
+                ->map([
+                    'new' => 'warning',
+                    'processed_ok' => 'success',
+                    'processed_error' => 'danger',
+                ]),
             Markdown::make('result'),
             Text::make('order_id')->readonly(),
             DateTime::make('created_at'),
