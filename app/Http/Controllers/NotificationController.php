@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\NotificationStored;
 use App\Models\Notification;
 use Illuminate\Http\Request;
 use PhpParser\Node\Stmt\TryCatch;
@@ -29,6 +30,8 @@ class NotificationController extends Controller
             $notification->source = $request->input('source');
             $notification->payload = $data; // Store the entire JSON request body
             $notification->save();
+
+            event(new NotificationStored($notification)); // to raise an event on notificationstored. The system will try to process the notification.
 
             return response()->json(['message' => 'Data saved successfully'], 201);
         } catch (\Exception $e) {
