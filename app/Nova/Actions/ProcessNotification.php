@@ -54,7 +54,7 @@ class ProcessNotification extends Action
         return [];
     }
 
-    private function processBokunNotification(\APP\Models\Notification $notification)
+    public function processBokunNotification(\APP\Models\Notification $notification)
     {
         if ($notification->source != 'bokun')
             return;
@@ -115,6 +115,12 @@ class ProcessNotification extends Action
                 $notification->save();
                 return;
             }
+            if (!$external_product->is_active) {
+                $notification->status = 'processed_error';
+                $notification->result = 'ExternalProduct with external_product_id(' . $external_product->external_product_id . ') and external_connection(' . $external_connection->name . ') is not active.';
+                $notification->save();
+                return;
+            }
             $products = $external_product->products()->get();
 
             if (!isset($products)) {
@@ -136,7 +142,7 @@ class ProcessNotification extends Action
         $notification->save();
     }
 
-    private function processEcwidNotification(\APP\Models\Notification $notification)
+    public function processEcwidNotification(\APP\Models\Notification $notification)
     {
         if ($notification->source != 'ecwid')
             return;
@@ -218,6 +224,14 @@ class ProcessNotification extends Action
                 $notification->save();
                 return;
             }
+
+            if (!$external_product->is_active) {
+                $notification->status = 'processed_error';
+                $notification->result = 'ExternalProduct with external_product_id(' . $external_product->external_product_id . ') and external_connection(' . $external_connection->name . ') is not active.';
+                $notification->save();
+                return;
+            }
+
             $products = $external_product->products()->get();
 
             if (!isset($products)) {
