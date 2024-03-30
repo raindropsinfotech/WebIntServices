@@ -144,7 +144,7 @@ class OrderItem extends Resource
     {
         return [
             ProcessNow::make(),
-            // ProcessManually::make(),
+            ProcessManually::make(),
         ];
     }
 
