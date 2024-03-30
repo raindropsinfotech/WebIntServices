@@ -101,7 +101,7 @@ class ProcessManually extends Action
             str_replace('{Service}', $orderItem->product->FullName, $subject);
 
             // replace placeholders in template
-            $content = $template->content;
+            $content = $template->Content;
             str_replace('{Order_Number}', $order->ShopOrderNumber, $content);
             str_replace('{Service}', $orderItem->product->FullName, $content);
 
@@ -114,6 +114,7 @@ class ProcessManually extends Action
                 'mail.'
             ]);
 
+            \Log::info($content);
             \Log::info('configuration set.');
 
             Mail::to($email)->send(new TestEmail($fields->files, $content, $subject, $mailSettings->FromEmail, $order->externalConnection->name));

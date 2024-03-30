@@ -29,9 +29,9 @@ class TestEmail extends Mailable
 
     public function build()
     {
-        \Log::info('TestEmail.Build()');
-        return $this->view('emails.test')
-            ->with(['htmlContent' => $this->template])
+        \Log::info('TestEmail.Build()' . $this->template);
+        return $this->view('emails.test', ['content' => $this->template])
+            // ->with(['htmlContent' => $this->template])
             ->attach($this->selectedFiles->getRealPath(), array(
                 'as' => $this->selectedFiles->getClientOriginalName(),
                 'mime' => $this->selectedFiles->getMimeType()

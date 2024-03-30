@@ -1,4 +1,1 @@
-<html>
-Hello
-
-</html>
+{!! $content !!}
