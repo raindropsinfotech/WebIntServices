@@ -13,6 +13,8 @@ use Laravel\Nova\Fields\DateTime;
 use Laravel\Nova\Fields\BelongsTo;
 use Laravel\Nova\Fields\Date;
 use Laravel\Nova\Fields\HasMany;
+use Laravel\Nova\Fields\MorphMany;
+use Laravel\Nova\Fields\MorphToMany;
 use Laravel\Nova\Fields\Number as FieldsNumber;
 use Laravel\Nova\Fields\Select;
 use Laravel\Nova\Http\Requests\NovaRequest;
@@ -96,6 +98,7 @@ class OrderItem extends Resource
                         return $value->format('D, d M Y H:i:s'); // Customize the date format as per your preference
                 }),
             HasMany::make('audits', 'audits', Audit::class),
+            MorphMany::make('Communications'),
         ];
     }
 
@@ -144,7 +147,7 @@ class OrderItem extends Resource
     {
         return [
             ProcessNow::make(),
-            // ProcessManually::make(),
+            ProcessManually::make(),
         ];
     }
 

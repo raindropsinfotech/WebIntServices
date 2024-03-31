@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use OwenIt\Auditing\Contracts\Auditable;
 
 class OrderItem extends Model implements Auditable
@@ -58,5 +59,10 @@ class OrderItem extends Model implements Auditable
     public function order()
     {
         return $this->belongsTo(Order::class, 'OrderId', 'Id');
+    }
+
+    public function communications(): MorphMany
+    {
+        return $this->morphMany(Communication::class, 'communicable');
     }
 }

@@ -14,25 +14,43 @@ class TestEmail extends Mailable
     use Queueable, SerializesModels;
 
     protected $selectedFiles;
+    protected $template;
+
     /**
      * Create a new message instance.
      */
-    public function __construct($selectedFiles)
+    public function __construct($selectedFiles, $template, $subject, $fromMail, $fromName)
     {
         $this->selectedFiles = $selectedFiles;
+        $this->subject = $subject;
+        $this->template = $template;
+        $this->from = [['address' => $fromMail, 'name' => $fromName]];
     }
 
     public function build()
     {
-        $mail = $this->view('emails.test')
-            ->with(['files' => $this->selectedFiles])
-            ->attach($this->selectedFiles);
+        \Log::info('TestEmail.Build()' . $this->template);
+        return $this->view('emails.test', ['content' => $this->template])
+            // ->with(['htmlContent' => $this->template])
+            ->attach($this->selectedFiles->getRealPath(), array(
+                'as' => $this->selectedFiles->getClientOriginalName(),
+                'mime' => $this->selectedFiles->getMimeType()
+            ));
 
-        $file = $this->selectedFiles;
-        $mail->attach($file->getRealPath(), array(
-            'as' => $file->getClientOriginalName(),
-            'mime' => $file->getMimeType()
-        ));
+
+        // $mail = $this->view('emails.test')
+        //     ->with([
+        //         'files' => $this->selectedFiles,
+        //         'htmlContent' => $this->template
+        //     ])
+        //     ->attach($this->selectedFiles);
+
+        // $file = $this->selectedFiles;
+        // $mail->attach($file->getRealPath(), array(
+        //     'as' => $file->getClientOriginalName(),
+        //     'mime' => $file->getMimeType()
+        // ));
+        // $mail->subject($this->subject);
 
         // later can be used for multiple files.
         // if (count($this->selectedFiles) > 0) {
@@ -44,7 +62,7 @@ class TestEmail extends Mailable
         //     }
         // }
 
-        return $mail;
+        // return $mail;
     }
 
     /**

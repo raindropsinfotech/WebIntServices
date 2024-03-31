@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use OwenIt\Auditing\Contracts\Auditable;
 
 class Order extends Model implements Auditable
@@ -87,4 +88,10 @@ class Order extends Model implements Auditable
     protected $casts = [
         'OrderDateTime' => 'date'
     ];
+
+
+    public function communications(): MorphMany
+    {
+        return $this->morphMany(Communication::class, 'communicable');
+    }
 }

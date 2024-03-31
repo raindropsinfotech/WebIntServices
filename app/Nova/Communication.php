@@ -4,21 +4,19 @@ namespace App\Nova;
 
 use Illuminate\Http\Request;
 use Laravel\Nova\Fields\DateTime;
-use Laravel\Nova\Fields\HasOne;
 use Laravel\Nova\Fields\ID;
-use Laravel\Nova\Fields\KeyValue;
-use Laravel\Nova\Fields\Markdown;
+use Laravel\Nova\Fields\MorphTo;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Http\Requests\NovaRequest;
 
-class Audit extends Resource
+class Communication extends Resource
 {
     /**
      * The model the resource corresponds to.
      *
-     * @var class-string<\App\Models\Audit>
+     * @var class-string<\App\Models\Communication>
      */
-    public static $model =  \OwenIt\Auditing\Models\Audit::class;
+    public static $model = \App\Models\Communication::class;
 
     /**
      * The single value that should be used to represent the resource when being displayed.
@@ -42,6 +40,7 @@ class Audit extends Resource
      * @var string
      */
     public static $tableStyle = 'tight';
+
     /**
      * Get the fields displayed by the resource.
      *
@@ -52,17 +51,13 @@ class Audit extends Resource
     {
         return [
             ID::make()->sortable()->hideFromIndex(),
-            DateTime::make('created_at'),
-            Text::make('event'),
-            // Markdown::make('old_values'),
-            // Markdown::make('new_values'),
-            // Text::make('user_agent'),
-            // Text::make('tags'),
-            Text::make('user_id'),
-            HasOne::make('user')->display('name'),
-            KeyValue::make('old_values')->hideFromIndex(),
-            KeyValue::make('new_values')->hideFromIndex(),
-
+            DateTime::make('Created At'),
+            Text::make('Action'),
+            Text::make('Description'),
+            MorphTo::make('Communicable')->types([
+                Order::class,
+                OrderItem::class
+            ]),
         ];
     }
 
