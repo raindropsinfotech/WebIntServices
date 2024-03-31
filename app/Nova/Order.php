@@ -3,6 +3,7 @@
 namespace App\Nova;
 
 use App\Nova\Actions\CheckPayment;
+use App\Nova\Actions\UpdateOrderStatusOnShop;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Laravel\Nova\Fields\Badge;
@@ -147,6 +148,7 @@ class Order extends Resource
     {
         return [
             CheckPayment::make(),
+            UpdateOrderStatusOnShop::make(),
         ];
     }
 
