@@ -3,6 +3,8 @@
 namespace App\Nova\Actions;
 
 use App\Mail\TestEmail;
+use App\Models\Communication;
+use Auth;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
@@ -58,7 +60,7 @@ class ProcessManually extends Action
         if (!isset($order) || is_null($order))
             return Action::danger('Order is null');
 
-        \Log::info('Order set');
+        // \Log::info('Order set');
         //\Log::info($order);
         //\Log::info($order->externalConnection());
         $ecid = $order->external_connection_id;
@@ -114,7 +116,7 @@ class ProcessManually extends Action
                 'mail.'
             ]);
 
-            \Log::info($content);
+            // \Log::info($content);
             \Log::info('configuration set.');
 
             Mail::to($email)->send(new TestEmail($fields->files, $content, $subject, $mailSettings->FromEmail, $order->externalConnection->name));
@@ -122,8 +124,21 @@ class ProcessManually extends Action
             // If no exception is thrown, the email was sent successfully
             echo "Email sent successfully.";
 
+            $comm = new Communication();
+            $comm->action = "tickets sent";
+            $comm->description = "Tickets send by " . Auth::user()?->name . ' for (' . $orderItem->product->FullName . ')';
+
+            $orderItem->communications()->save($comm);
+
             $orderItem->IsProcessed = true;
             $orderItem->save();
+
+            $comm1 = new Communication();
+            $comm1->action = "status changed";
+            $comm1->description = "OrderItem set to 'Processed' automatically.";
+
+            $orderItem->communications()->save($comm1);
+
 
             return Action::message("Files sent to " . $orderItem->order->CustomerEmail . ' successfully.');
         } catch (\Exception $e) {
