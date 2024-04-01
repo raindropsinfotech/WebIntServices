@@ -2,6 +2,7 @@
 
 namespace App\Nova\Actions;
 
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Collection;
@@ -249,10 +250,9 @@ class ProcessNotification extends Action
                 $dateElement = array_filter($item->selectedOptions, function ($obj) {
                     return $obj->type == 'DATE';
                 });
-                if (isset($dateElement)) {
+                if (isset($dateElement) && count($dateElement) > 0) {
                     $serviceDate = date("y-m-d h:i:s", strtotime($dateElement[0]->value));
                 }
-
 
                 $this->addOrdeItem($order->Id, $product->Id, $item->id, $serviceDate, $item->quantity);
             }

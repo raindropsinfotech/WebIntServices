@@ -33,7 +33,7 @@ class Audit extends Resource
      * @var array
      */
     public static $search = [
-        'id',
+        'id', 'user_id',
     ];
 
     /**
@@ -58,7 +58,7 @@ class Audit extends Resource
             // Markdown::make('new_values'),
             // Text::make('user_agent'),
             // Text::make('tags'),
-            Text::make('user_id'),
+            Text::make('user_id')->filterable(),
             HasOne::make('user')->display('name'),
             KeyValue::make('old_values')->hideFromIndex(),
             KeyValue::make('new_values')->hideFromIndex(),
