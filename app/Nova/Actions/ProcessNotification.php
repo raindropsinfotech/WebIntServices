@@ -297,8 +297,10 @@ class ProcessNotification extends Action
 
     private function getOrder($external_connection_id, $shopOrderNumber,  $orderTotal, $orderDate, $customerEmail, $customerName, $customerPhone, $payment_reference)
     {
-        $order = \App\Models\Order::where('ShopOrderNumber', $shopOrderNumber)
-            ->where('external_connection_id', $external_connection_id)->first();
+        // first check order number
+        // if external connection is not attached then attach external connection.
+        $order = \App\Models\Order::where('ShopOrderNumber', $shopOrderNumber)->first();
+        // ->where('external_connection_id', $external_connection_id)->first();
         if ($order == null)
             $order = new \App\Models\Order();
 

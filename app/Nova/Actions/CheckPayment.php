@@ -140,12 +140,26 @@ class CheckPayment extends Action
         if (!is_null($ch->payment_method_details->card->three_d_secure)) {
             \Log::info('result  = ' . $ch->payment_method_details->card->three_d_secure->result);
         }
-
-        if (($order->OrderTotal * 100 == $ch->amount_captured)
+        if (!(($order->OrderTotal * 100 == $ch->amount_captured)
             && $ch->status === "succeeded"
             && !is_null($ch->payment_method_details)
             && !is_null($ch->payment_method_details->card)
-            && !is_null($ch->payment_method_details->card->three_d_secure)
+        )) {
+
+            return false;
+        }
+
+        // if apple_pay payment
+        if (!is_null($ch->payment_method_details->card->wallet) &&  $ch->payment_method_details->card->wallet->type == "apple_pay") {
+            $order->PaymentStatus = 2;
+            $order->save();
+
+            return true;
+        }
+
+        // if 3d_secure_card payment
+        if (
+            !is_null($ch->payment_method_details->card->three_d_secure)
             &&  $ch->payment_method_details->card->three_d_secure->result == "authenticated"
         ) {
             $order->PaymentStatus = 2;
