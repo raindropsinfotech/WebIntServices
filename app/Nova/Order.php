@@ -3,6 +3,7 @@
 namespace App\Nova;
 
 use App\Nova\Actions\CheckPayment;
+use App\Nova\Actions\ReviewRequest;
 use App\Nova\Actions\UpdateOrderStatusOnShop;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -149,6 +150,7 @@ class Order extends Resource
         return [
             CheckPayment::make(),
             UpdateOrderStatusOnShop::make(),
+            ReviewRequest::make(),
         ];
     }
 

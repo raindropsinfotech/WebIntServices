@@ -251,7 +251,7 @@ class ProcessNotification extends Action
                     return $obj->type == 'DATE';
                 });
                 if (isset($dateElement) && count($dateElement) > 0) {
-                    $serviceDate = date("y-m-d h:i:s", strtotime($dateElement[0]->value));
+                    $serviceDate = date("y-m-d h:i:s", strtotime(head($dateElement)->value));
                 }
 
                 $this->addOrdeItem($order->Id, $product->Id, $item->id, $serviceDate, $item->quantity);
