@@ -41,6 +41,7 @@ class RolesAndPermissionsSeeder extends Seeder
         Permission::create(['name' => 'manage mailSettings']);
         Permission::create(['name' => 'view communications']);
         Permission::create(['name' => 'manage communications']);
+        Permission::create(['name' => 'view audit']);
 
 
         //create roles
