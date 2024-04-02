@@ -26,9 +26,9 @@ class AssignPermissions extends Action
      */
     public function handle(ActionFields $fields, Collection $models)
     {
-        if ($models->count() > 1) {
-            return Action::danger('Please run this action on only one user resource');
-        }
+        // if ($models->count() > 1) {
+        //     return Action::danger('Please run this action on only one user resource');
+        // }
         // Get all input data from the request
 
         foreach ($models as $user) {
@@ -37,7 +37,7 @@ class AssignPermissions extends Action
 
         // $user->givePermissionTo('edit articles');
 
-        return ActionResponse::message('Permissions(' . $fields->permission . ') assinged to Role(' . $models->first()->name . ').');
+        return ActionResponse::message('Permissions(' . $fields->permission . ') assinged to ' . $models->count() . ' users.');
     }
 
     /**

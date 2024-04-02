@@ -88,7 +88,7 @@ class OrderItem extends Resource
                 ->displayUsing(function ($value) {
                     return $value->format('D, d M Y H:i:s'); // Customize the date format as per your preference
                 })
-                ->filterable()->required(),
+                ->filterable()->sortable()->required(),
             Boolean::make('Pospond Delivery', 'PostpondDelivery'),
             DateTime::make('created_at', 'CreatedAt')->readonly()->onlyOnDetail(),
             DateTime::make('updated_at', 'UpdatedAt')->readonly()->onlyOnDetail(),

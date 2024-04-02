@@ -79,13 +79,21 @@ class Order extends Resource
             BelongsTo::make('ExternalConnection', 'externalConnection')->display('name')->exceptOnForms()->filterable(),
             HasMany::make('Order Items', 'orderItems', OrderItem::class),
             Badge::make('PaymentStatus', 'PaymentStatus')
+                ->labels([
+                    0 => 'Unpaid',
+                    1 => 'PartiallyPaid',
+                    2 => 'Paid',
+                    3 => 'Refunded'
+                ])
                 ->withIcons()
                 ->map([
                     '0' => 'danger',
                     '1' => 'danger',
                     '2' => 'success',
                     '3' => 'warning'
-                ])->default(0),
+                ])->default(0)
+
+                ->filterable(),
             Number::make('total', 'OrderTotal'),
             Select::make('Payment Status', 'PaymentStatus')
                 ->options([

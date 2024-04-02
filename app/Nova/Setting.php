@@ -46,6 +46,8 @@ class Setting extends Resource
             Text::make('TicketFolder', 'TicketFolder'),
             Text::make('TemplateFolder', 'TemplateFolder'),
             Text::make('Comment', 'Comment'),
+            Boolean::make('EnableNotifications', 'EnableNotifications'),
+            Text::make('NotificationKey', 'NotificationKey'),
             Boolean::make('Active', 'Active'),
         ];
     }

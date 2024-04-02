@@ -12,7 +12,12 @@ class NotificationController extends Controller
     public function store(Request $request)
     {
         try {
-            $env_key = env('API_KEY', 'KZDjVDcpouleeir2bXovWSh4tv5RFK3y');
+
+            $settings = \App\Models\Setting::where('Active', true)->first();
+            if (is_null($settings) || $settings->EnableNotifications == false)
+                return response()->json(['message' => 'Not allowed'], 405);
+
+            // $env_key = env('API_KEY', 'KZDjVDcpouleeir2bXovWSh4tv5RFK3y');
             $request->validate([
                 'source' => 'required|string',
                 'key' => 'required|string'
@@ -20,7 +25,10 @@ class NotificationController extends Controller
 
             $key = $request->input('key');
 
-            if ($key != $env_key)
+            // if ($key != $env_key)
+            //     return response()->json(['message' => 'Unauthorized request'], 401);
+
+            if ($key != $settings->NotificationKey)
                 return response()->json(['message' => 'Unauthorized request'], 401);
 
             $data = json_encode($request->json()->all());
