@@ -1,4 +1,4 @@
-name: Deploy Laravel Project
+name: Deploy Laravel Project to beta
 on:
   push:
     branches:
