@@ -247,9 +247,12 @@ class ProcessNotification extends Action
             foreach ($products as $product) {
 
                 $serviceDate = date("y-m-d h:i:s", strtotime('+2 days'));
-                $dateElement = array_filter($item->selectedOptions, function ($obj) {
-                    return $obj->type == 'DATE';
-                });
+                if (isset($item) && isset($item->selectedOptions)) {
+                    $dateElement = array_filter($item->selectedOptions, function ($obj) {
+                        return $obj->type == 'DATE';
+                    });
+                }
+
                 if (isset($dateElement) && count($dateElement) > 0) {
                     $serviceDate = date("y-m-d h:i:s", strtotime(head($dateElement)->value));
                 }
