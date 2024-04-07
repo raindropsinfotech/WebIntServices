@@ -48,7 +48,7 @@ class UpdateOrderStatusOnShop extends Action
         return [];
     }
 
-    public function setOrderStatus(\App\Models\Order $order)
+    public function setOrderStatus(\App\Models\Order $order, $status = "DELIVERED")
     {
         if ($order->externalConnection->connection_type != 'ecwid')
             return;
@@ -76,7 +76,7 @@ class UpdateOrderStatusOnShop extends Action
         $storeId = $credentials->Username;
         $token = $credentials->Password;
         $request = [
-            "fulfillmentStatus" => "DELIVERED"
+            "fulfillmentStatus" => $status
         ];
         $shopOrderNumber = $order->ShopOrderNumber;
         // $shopOrderNumber = 'G2D21106720';
@@ -94,9 +94,9 @@ class UpdateOrderStatusOnShop extends Action
 
 
         if ($response->getStatusCode() == 200)
-            $comm->description = "OrderStatus sent to shop by " . Auth::user()?->name . ' for ' . $order->ShopOrderNumber;
+            $comm->description = "OrderStatus '" . $status . "' sent to shop by " . Auth::user()?->name . ' for ' . $order->ShopOrderNumber;
         else
-            $comm->description = "Error: OrderStatus sent to shop by " . Auth::user()?->name . ' for ' . $order->ShopOrderNumber;
+            $comm->description = "Error: OrderStatus '" . $status . "' sent to shop by " . Auth::user()?->name . ' for ' . $order->ShopOrderNumber;
 
         $order->communications()->save($comm);
     }
