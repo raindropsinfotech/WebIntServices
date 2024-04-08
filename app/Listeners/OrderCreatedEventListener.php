@@ -3,6 +3,7 @@
 namespace App\Listeners;
 
 use App\Events\OrderCreatedEvent;
+use App\Models\EcwidHelper;
 use App\Nova\Actions\UpdateOrderStatusOnShop;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
@@ -14,7 +15,7 @@ class OrderCreatedEventListener
      */
     public function __construct()
     {
-        //
+        \Log::info("OrderCreatedEventListener invoked.");
     }
 
     /**
@@ -27,7 +28,7 @@ class OrderCreatedEventListener
         // whenever this event raises
         // 1. Change Shop Order status to Processing
         // 2. Check Order Payment status and update accordingly.
-        $updater = new UpdateOrderStatusOnShop();
-        $updater->setOrderStatus($event->order, 'PROCESSING');
+
+        EcwidHelper::setOrderStatus($event->order, 'PROCESSING');
     }
 }

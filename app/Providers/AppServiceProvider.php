@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Events\NotificationStored;
 use App\Events\OrderCreatedEvent;
+use App\Listeners\OrderCreatedEventListener;
 use App\Listeners\ProcessNotificationListener;
 use App\Models\User;
 use App\Observers\UserObserver;
@@ -27,6 +28,6 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Event::listen(NotificationStored::class, ProcessNotificationListener::class);
-        Event::listen(OrderCreatedEvent::class, OrderCreatedEvent::class);
+        Event::listen(OrderCreatedEvent::class, OrderCreatedEventListener::class);
     }
 }
