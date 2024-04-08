@@ -34,8 +34,8 @@ class UpdateOrderStatusOnShop extends Action
 
         $succs = 0;
         foreach ($models as $order) {
-            if ($order->Status != 2)
-                continue;
+            // if ($order->Status != 2)
+            //     continue;
 
             EcwidHelper::setOrderStatus($order, $status);
             $succs++;
@@ -57,7 +57,9 @@ class UpdateOrderStatusOnShop extends Action
                 'AWAITING_PROCESSING' => 'AWAITING_PROCESSING',
                 'PROCESSING' => 'PROCESSING',
                 'DELIVERED' => 'DELIVERED',
-                'OUT_FOR_DELIVERY' => 'OUT_FOR_DELIVERY'
+                'OUT_FOR_DELIVERY' => 'OUT_FOR_DELIVERY',
+                'WILL_NOT_DELIVER' => 'WILL_NOT_DELIVER',
+                'RETURNED' => 'RETURNED'
             ])
         ];
     }
