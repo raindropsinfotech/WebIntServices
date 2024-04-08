@@ -2,6 +2,7 @@
 
 namespace App\Nova\Actions;
 
+use App\Events\OrderCreatedEvent;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\InteractsWithQueue;
@@ -206,7 +207,7 @@ class ProcessNotification extends Action
 
         $ecwidResponse = json_decode($ecwidResponseData);
 
-        $order = $this->getOrder($external_connection->id, $ecwidResponse->id, $ecwidResponse->total, date("y-m-d h:i:s", $ecwidResponse->createTimestamp), $ecwidResponse->email, $ecwidResponse->billingPerson->name, $ecwidResponse->billingPerson->phone, $ecwidResponse->externalTransactionId);
+        $order = $this->getOrder($external_connection->id, $ecwidResponse->id, $ecwidResponse->total, date("y-m-d h:i:s", $ecwidResponse->createTimestamp), $ecwidResponse->email, $ecwidResponse->billingPerson->name, $ecwidResponse->billingPerson->phone, isset($ecwidResponse->externalTransactionId) ? $ecwidResponse->externalTransactionId : null);
         if (!isset($order)) {
             $notification->status = 'processed_error';
             $notification->result = 'Unable to create order.';
@@ -216,6 +217,7 @@ class ProcessNotification extends Action
 
         $notification->order_id = $order->Id;
         $notification->save();
+
 
         foreach ($ecwidResponse->items as $item) {
             $external_product = \App\Models\ExternalProduct::where('external_connection_id', $external_connection->id)->where('external_product_id', $item->sku)->first();
@@ -303,9 +305,12 @@ class ProcessNotification extends Action
         // first check order number
         // if external connection is not attached then attach external connection.
         $order = \App\Models\Order::where('ShopOrderNumber', $shopOrderNumber)->first();
+        $is_new = false;
         // ->where('external_connection_id', $external_connection_id)->first();
-        if ($order == null)
+        if ($order == null) {
             $order = new \App\Models\Order();
+            $is_new = true;
+        }
 
         $order->CustomerName = $customerName;
         $order->CustomerEmail = $customerEmail;
@@ -316,6 +321,9 @@ class ProcessNotification extends Action
         $order->external_connection_id = $external_connection_id;
         $order->PaymentReference = $payment_reference;
         $order->save();
+
+        if ($is_new)
+            event(new OrderCreatedEvent($order));
 
         return $order;
     }
