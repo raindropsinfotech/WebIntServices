@@ -10,6 +10,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Collection;
 use Laravel\Nova\Actions\Action;
 use Laravel\Nova\Fields\ActionFields;
+use Laravel\Nova\Fields\Select;
 use Laravel\Nova\Http\Requests\NovaRequest;
 
 class UpdateOrderStatusOnShop extends Action
@@ -25,12 +26,17 @@ class UpdateOrderStatusOnShop extends Action
      */
     public function handle(ActionFields $fields, Collection $models)
     {
+
+        $status = $fields->status;
+        if (!isset($status))
+            return Action::danger("Select one status.");
+
         $succs = 0;
         foreach ($models as $order) {
             if ($order->Status != 2)
                 continue;
 
-            $this->setOrderStatus($order);
+            $this->setOrderStatus($order, $status);
             $succs++;
         }
 
@@ -45,7 +51,14 @@ class UpdateOrderStatusOnShop extends Action
      */
     public function fields(NovaRequest $request)
     {
-        return [];
+        return [
+            Select::make('status')->options([
+                'AWAITING_PROCESSING' => 'AWAITING_PROCESSING',
+                'PROCESSING' => 'PROCESSING',
+                'DELIVERED' => 'DELIVERED',
+                'OUT_FOR_DELIVERY' => 'OUT_FOR_DELIVERY'
+            ])
+        ];
     }
 
     public function setOrderStatus(\App\Models\Order $order, $status = "DELIVERED")
