@@ -3,7 +3,6 @@
 namespace App\Nova\Actions;
 
 use App\Events\OrderCreatedEvent;
-use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Collection;
@@ -161,10 +160,26 @@ class ProcessNotification extends Action
 
         $store_id = $payloadArray->storeId;
 
+        if (($payloadArray->eventType != 'order.created')) {
+            $notification->status = 'processed_error';
+            $notification->result = 'Order (' . $payloadArray->data->orderId . ') cannot be imported. Error: ecwid-eventType = ' . $payloadArray->eventType;
+            $notification->save();
+            return;
+        }
 
-        if (($payloadArray->eventType != 'order.created') || $payloadArray->data->newPaymentStatus != 'PAID' || $payloadArray->data->newFulfillmentStatus != 'AWAITING_PROCESSING') {
-            $notification->status = 'ingnored';
-            $notification->result = 'Ignored because system only process PAID orders.';
+
+
+
+        if ($payloadArray->data->newPaymentStatus != 'PAID') {
+            $notification->status = 'processed_error';
+            $notification->result = 'Order (' . $payloadArray->data->orderId . ') cannot be imported. Error: ecwid-paymentStatus = ' . $payloadArray->data->newPaymentStatus;
+            $notification->save();
+            return;
+        }
+
+        if ($payloadArray->data->newFulfillmentStatus != 'AWAITING_PROCESSING') {
+            $notification->status = 'processed_error';
+            $notification->result = 'Order (' . $payloadArray->data->orderId . ') cannot be imported. Error: ecwid-newFulfillmentStatus = ' . $payloadArray->data->newFulfillmentStatus;
             $notification->save();
             return;
         }
