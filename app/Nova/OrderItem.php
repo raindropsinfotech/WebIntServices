@@ -74,30 +74,30 @@ class OrderItem extends Resource
     {
         return [
             ID::make('id', 'Id')->sortable(),
-            Boolean::make('Processed', 'IsProcessed')->filterable(),
+            Boolean::make('Processed', 'IsProcessed')->filterable()->readonly(),
             BelongsTo::make('Order', 'order', Order::class)->display('ShopOrderNumber')->readonly(),
-            Text::make('externalId', 'ExrenalId')->showOnDetail(),
+            Text::make('External Id', 'ExrenalId')->hideFromIndex(),
             Select::make('Product', 'ProductId')
                 ->options(\App\Models\Product::where('ProductType', 0)->pluck('FullName', 'Id'))->onlyOnForms(),
 
             BelongsTo::make('Product', 'product', Product::class)->display('FullName')
                 ->exceptOnForms(),
             FieldsNumber::make('Adults', 'Adults'),
-            Text::make('Kids', 'Children'),
+            Text::make('Kids', 'Children')->hideFromIndex(),
             Date::make('ServiceDate', 'ServiceDateTime')
                 ->displayUsing(function ($value) {
                     return $value->format('D, d M Y H:i:s'); // Customize the date format as per your preference
                 })
                 ->filterable()->sortable()->required(),
             Boolean::make('Pospond Delivery', 'PostpondDelivery'),
-            DateTime::make('created_at', 'CreatedAt')->readonly()->onlyOnDetail(),
-            DateTime::make('updated_at', 'UpdatedAt')->readonly()->onlyOnDetail(),
+            DateTime::make('Created at', 'CreatedAt')->readonly()->onlyOnDetail(),
+            DateTime::make('Updated at', 'UpdatedAt')->readonly()->onlyOnDetail(),
             DateTime::make('ProcessDateTime', 'ProcessDateTime')->filterable()
                 ->displayUsing(function ($value) {
                     if ($value)
                         return $value->format('D, d M Y H:i:s'); // Customize the date format as per your preference
                 }),
-            HasMany::make('audits', 'audits', Audit::class),
+            HasMany::make('Audits', 'audits', Audit::class),
             MorphMany::make('Communications'),
         ];
     }
