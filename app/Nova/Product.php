@@ -45,15 +45,16 @@ class Product extends Resource
     public function fields(NovaRequest $request)
     {
         return [
-            ID::make('id', 'Id')->sortable(),
-            Text::make('name', 'Name'),
-            Text::make('fullName', 'FullName'),
-            Select::make('productType', 'ProductType')->options([
+            ID::make('Id', 'Id')->sortable(),
+            Text::make('Name', 'Name'),
+            Text::make('Full Name', 'FullName'),
+            Select::make('Product Type', 'ProductType')->options([
                 0 => 'Single',
                 1 => 'Combo'
             ])->displayUsingLabels()->filterable(),
             BelongsToMany::make('ExternalProducts', 'externalProducts', ExternalProduct::class),
-            HasMany::make('audits', 'audits', Audit::class),
+            Text::make('Folder', 'Folder'),
+            HasMany::make('Audits', 'audits', Audit::class),
         ];
     }
 
