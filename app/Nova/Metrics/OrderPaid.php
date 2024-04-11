@@ -2,11 +2,11 @@
 
 namespace App\Nova\Metrics;
 
-use App\Models\Notification;
+use App\Models\Order;
 use Laravel\Nova\Http\Requests\NovaRequest;
 use Laravel\Nova\Metrics\Partition;
 
-class NotificationProcessed extends Partition
+class OrderPaid extends Partition
 {
     /**
      * Calculate the value of the metric.
@@ -16,12 +16,16 @@ class NotificationProcessed extends Partition
      */
     public function calculate(NovaRequest $request)
     {
-        return $this->count($request, Notification::class, 'status')
+        return $this->count($request, Order::class, 'PaymentStatus')
             ->colors([
-                'processed_ok' => 'green',
-                'processed_error' => 'red',
-                'new' => 'red'
-            ]);
+                2 => 'green',
+            ])
+            ->label(fn ($value) => match ($value) {
+                0 => 'Unpaid',
+                1 => 'PartiallyPadid',
+                2 => 'Paid',
+                3 => 'Refunded'
+            });
     }
 
     /**
@@ -41,6 +45,6 @@ class NotificationProcessed extends Partition
      */
     public function uriKey()
     {
-        return 'notification-processed';
+        return 'order-paid';
     }
 }
