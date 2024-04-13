@@ -62,18 +62,16 @@ class Order extends Resource
     public function fields(NovaRequest $request)
     {
         return [
-            ID::make('id', 'Id')->readonly()->sortable(),
-            Text::make('shopOrderNumber', 'ShopOrderNumber')->required(),
-            Select::make('status', 'Status')->options([
+            ID::make('Id', 'Id')->readonly()->sortable(),
+            Text::make('Shop Order Number', 'ShopOrderNumber')->required(),
+            Select::make('Status', 'Status')->options([
                 0 => 'New',
                 1 => 'PartiallyCompleted',
                 2 => 'Completed',
                 3 => 'Cancelled'
             ])->displayUsingLabels()->filterable()->hideWhenCreating()->default(0),
-            Text::make('customerName', 'CustomerName')->required(),
-            Email::make('customerEmail', 'CustomerEmail')->required(),
-            DateTime::make('created_at', 'CreatedAt')->readonly()->onlyOnDetail(),
-            DateTime::make('updated_at', 'UpdatedAt')->readonly()->onlyOnDetail(),
+            Text::make('Customer Name', 'CustomerName')->required(),
+            Email::make('Customer Email', 'CustomerEmail')->required(),
             Select::make('ExternalConnection', 'external_connection_id')->options(\App\Models\ExternalConnection::pluck('name', 'id'))->required()->onlyOnForms(),
             // BelongsTo::make('external_connection_id', 'externalConnection', \App\Models\ExternalConnection::class)->display('name')->exceptOnForms(),
             BelongsTo::make('ExternalConnection', 'externalConnection')->display('name')->exceptOnForms()->filterable(),
@@ -94,7 +92,7 @@ class Order extends Resource
                 ])->default(0)
 
                 ->filterable(),
-            Number::make('total', 'OrderTotal'),
+            Number::make('Order Total', 'OrderTotal'),
             Select::make('Payment Status', 'PaymentStatus')
                 ->options([
                     0 => 'Unpaid',
@@ -108,9 +106,11 @@ class Order extends Resource
                 ->hideWhenCreating(),
             Date::make('Order Time', 'OrderDateTime')
                 ->default(Carbon::today()),
-            HasMany::make('audits', 'audits', Audit::class),
+            HasMany::make('Audits', 'audits', Audit::class),
             Text::make('PaymentReference', 'PaymentReference')->readonly(),
             MorphMany::make('Communications'),
+            DateTime::make('Created at', 'CreatedAt')->readonly()->onlyOnDetail(),
+            DateTime::make('Updated at', 'UpdatedAt')->readonly()->onlyOnDetail(),
         ];
     }
 

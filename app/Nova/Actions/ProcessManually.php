@@ -2,11 +2,10 @@
 
 namespace App\Nova\Actions;
 
-use App\Mail\TestEmail;
+use App\Mail\ManualEmail;
 use App\Models\Communication;
 use Auth;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Mail;
@@ -49,7 +48,7 @@ class ProcessManually extends Action
         if (!isset($orderItem))
             return Action::danger('OrderItem is null');
 
-        \Log::info('orderItem set');
+        // \Log::info('orderItem set');
 
         // \Log::info($orderItem);
 
@@ -99,13 +98,14 @@ class ProcessManually extends Action
             \Log::info('sending email...');
             // Attempt to send the email
             $subject = $template->Subject;
-            str_replace('{Order_Number}', $order->ShopOrderNumber, $subject);
-            str_replace('{Service}', $orderItem->product->FullName, $subject);
+            $subject = str_replace('{Order_Number}', $order->ShopOrderNumber, $subject);
+            $subject = str_replace('{Service}', $orderItem->product->FullName, $subject);
 
             // replace placeholders in template
             $content = $template->Content;
-            str_replace('{Order_Number}', $order->ShopOrderNumber, $content);
-            str_replace('{Service}', $orderItem->product->FullName, $content);
+            $content = str_replace('{Order_Number}', $order->ShopOrderNumber, $content);
+            $content = str_replace('{Service}', $orderItem->product->FullName, $content);
+            $content = str_replace('{Customer_First_Name}', $order->CustomerName, $content);
 
             config([
                 'mail.driver' => 'smtp',
@@ -119,7 +119,7 @@ class ProcessManually extends Action
             // \Log::info($content);
             \Log::info('configuration set.');
 
-            Mail::to($email)->send(new TestEmail($fields->files, $content, $subject, $mailSettings->FromEmail, $order->externalConnection->name));
+            Mail::to($email)->send(new ManualEmail($fields->files, $content, $subject, $order->externalConnection->name, $mailSettings));
 
             // If no exception is thrown, the email was sent successfully
             echo "Email sent successfully.";

@@ -3,13 +3,11 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
-use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class TestEmail extends Mailable
+class ManualEmail extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -19,12 +17,14 @@ class TestEmail extends Mailable
     /**
      * Create a new message instance.
      */
-    public function __construct($selectedFiles, $template, $subject, $fromMail, $fromName)
+    public function __construct($selectedFiles, $template, $subject, $fromName, $mailSettings)
     {
         $this->selectedFiles = $selectedFiles;
         $this->subject = $subject;
         $this->template = $template;
-        $this->from = [['address' => $fromMail, 'name' => $fromName]];
+
+        $this->from = [['address' => $mailSettings->FromEmail, 'name' => $fromName]];
+        $this->bcc = [['address' => $mailSettings->BCCEmail, 'name' => $mailSettings->BCCEmail]];
     }
 
     public function build()
@@ -68,12 +68,12 @@ class TestEmail extends Mailable
     /**
      * Get the message envelope.
      */
-    public function envelope(): Envelope
-    {
-        return new Envelope(
-            subject: 'Test Email',
-        );
-    }
+    // public function envelope(): Envelope
+    // {
+    //     return new Envelope(
+    //         subject: 'Test Email',
+    //     );
+    // }
 
     /**
      * Get the message content definition.
