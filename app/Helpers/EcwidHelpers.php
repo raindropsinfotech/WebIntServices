@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Models;
+namespace App\Helpers;
 
+use App\Models\Communication;
 use Illuminate\Support\Facades\Auth;
 
-class EcwidHelper
+class EcwidHelpers
 {
     public static function setOrderStatus(\App\Models\Order $order, $status = "DELIVERED")
     {

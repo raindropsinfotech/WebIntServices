@@ -2,11 +2,8 @@
 
 namespace App\Nova\Actions;
 
-use App\Models\Communication;
-use App\Models\EcwidHelper;
-use Auth;
+use App\Helpers\EcwidHelpers as HelpersEcwidHelper;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Collection;
 use Laravel\Nova\Actions\Action;
@@ -37,7 +34,7 @@ class UpdateOrderStatusOnShop extends Action
             // if ($order->Status != 2)
             //     continue;
 
-            EcwidHelper::setOrderStatus($order, $status);
+            HelpersEcwidHelper::setOrderStatus($order, $status);
             $succs++;
         }
 

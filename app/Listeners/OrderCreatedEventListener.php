@@ -3,6 +3,8 @@
 namespace App\Listeners;
 
 use App\Events\OrderCreatedEvent;
+use App\Helpers\EcwidHelpers;
+use App\Helpers\StripeHelpers;
 use App\Models\EcwidHelper;
 use App\Nova\Actions\UpdateOrderStatusOnShop;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -28,7 +30,7 @@ class OrderCreatedEventListener
         // whenever this event raises
         // 1. Change Shop Order status to Processing
         // 2. Check Order Payment status and update accordingly.
-
-        EcwidHelper::setOrderStatus($event->order, 'PROCESSING');
+        StripeHelpers::checkPayment($event->order);
+        EcwidHelpers::setOrderStatus($event->order, 'PROCESSING');
     }
 }
