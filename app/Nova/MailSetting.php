@@ -44,6 +44,7 @@ class MailSetting extends Resource
     {
         return [
             ID::make('id', 'Id')->sortable(),
+            Text::make('Company Name', 'CompanyName'),
             Text::make('host', 'Host'),
             Text::make('username', 'Username'),
             Text::make('paswword', 'Password'),
