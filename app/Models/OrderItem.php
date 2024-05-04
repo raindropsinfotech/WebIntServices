@@ -65,4 +65,9 @@ class OrderItem extends Model implements Auditable
     {
         return $this->morphMany(Communication::class, 'communicable');
     }
+
+    public function loggable(): MorphMany
+    {
+        return $this->morphMany(ApiLog::class, 'loggable');
+    }
 }

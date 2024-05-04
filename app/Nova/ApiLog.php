@@ -2,23 +2,23 @@
 
 namespace App\Nova;
 
-use App\Nova\Metrics\ProductsSold;
 use Illuminate\Http\Request;
-use Laravel\Nova\Fields\BelongsToMany;
-use Laravel\Nova\Fields\HasMany;
+use Laravel\Nova\Fields\Code;
+use Laravel\Nova\Fields\DateTime;
 use Laravel\Nova\Fields\ID;
-use Laravel\Nova\Fields\Select;
+use Laravel\Nova\Fields\MorphTo;
+use Laravel\Nova\Fields\Number;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Http\Requests\NovaRequest;
 
-class Product extends Resource
+class ApiLog extends Resource
 {
     /**
      * The model the resource corresponds to.
      *
-     * @var class-string<\App\Models\Product>
+     * @var class-string<\App\Models\ApiLog>
      */
-    public static $model = \App\Models\Product::class;
+    public static $model = \App\Models\ApiLog::class;
 
     /**
      * The single value that should be used to represent the resource when being displayed.
@@ -33,7 +33,7 @@ class Product extends Resource
      * @var array
      */
     public static $search = [
-        'id', 'name', 'fullName',
+        'id',
     ];
 
     /**
@@ -45,21 +45,14 @@ class Product extends Resource
     public function fields(NovaRequest $request)
     {
         return [
-            ID::make('Id', 'Id')->sortable(),
-            Text::make('Name', 'Name'),
-            Text::make('Full Name', 'FullName'),
-            Select::make('Product Type', 'ProductType')->options([
-                0 => 'Single',
-                1 => 'Combo'
-            ])->displayUsingLabels()->filterable(),
-            BelongsToMany::make('ExternalProducts', 'externalProducts', ExternalProduct::class),
-            Text::make('Folder', 'Folder'),
-            Select::make('Processing Type', 'OrderProcessingType')->options([
-                0 => 'None',
-                1 => 'FTP',
-                2 => 'Rayna'
-            ])->displayUsingLabels()->filterable(),
-            HasMany::make('Audits', 'audits', Audit::class),
+            ID::make()->sortable(),
+            Text::make('User'),
+            Text::make('Method'),
+            Text::make('Path'),
+            Code::make('RequestBody', 'request_body'),
+            Code::make('ResponseBody', 'response_body'),
+            Number::make('StatusCode', 'status_code'),
+            Text::make('IpAddress', 'ip_address'),
         ];
     }
 
@@ -71,9 +64,7 @@ class Product extends Resource
      */
     public function cards(NovaRequest $request)
     {
-        return [
-            ProductsSold::make()->onlyOnDetail()->width('1/2')
-        ];
+        return [];
     }
 
     /**

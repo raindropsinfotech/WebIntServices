@@ -6,7 +6,9 @@ use Illuminate\Http\Request;
 use Laravel\Nova\Fields\BelongsTo;
 use Laravel\Nova\Fields\BelongsToMany;
 use Laravel\Nova\Fields\Boolean;
+use Laravel\Nova\Fields\Code;
 use Laravel\Nova\Fields\ID;
+use Laravel\Nova\Fields\KeyValue;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Http\Requests\NovaRequest;
 
@@ -48,6 +50,7 @@ class ExternalProduct extends Resource
             Text::make('external_product_id'),
             BelongsTo::make('external_connection_id', 'externalConnection', ExternalConnection::class)->display('name'),
             Boolean::make('is_active'),
+            Code::make('Additional Data')->rules('json')->nullable(),
             BelongsToMany::make('Products', 'products', Product::class)->searchable()->display(function ($product) {
                 $productType = $product->ProductType === 0 ? 'Single' : 'Combo';
                 return  $product->Id . ' - ' . $product->FullName . ' (' . $productType . ')';
@@ -55,6 +58,7 @@ class ExternalProduct extends Resource
 
         ];
     }
+
 
     /**
      * Get the cards available for the request.
