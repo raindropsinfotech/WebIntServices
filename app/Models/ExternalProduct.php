@@ -19,4 +19,16 @@ class ExternalProduct extends Model
     {
         return $this->belongsTo(ExternalConnection::class);
     }
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'additional_data' => 'array',
+        ];
+    }
 }

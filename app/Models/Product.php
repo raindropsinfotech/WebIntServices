@@ -46,6 +46,12 @@ class Product extends Model implements Auditable
             0 => 'Single',
             1 => 'Combo'
         ],
+        'OrderProcessingType' => [
+            0 => 'None',
+            1 => 'FTP',
+            2 => 'Rayna',
+            3 => 'Rathin'
+        ]
     ];
 
     protected $attributes = [
@@ -58,5 +64,11 @@ class Product extends Model implements Auditable
         'GatePrice' => 0,
         'CostINR' => 0,
         'MinumumSellingPriceAED' => 0
+    ];
+
+
+    public static $orderProcessingTypes = [
+        2 => 'Rayna',
+        3 => 'Rathin'
     ];
 }
