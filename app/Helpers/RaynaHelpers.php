@@ -3,6 +3,7 @@
 namespace App\Helpers;
 
 use App\Models\ApiLog;
+use App\Models\Communication;
 use App\Models\ExternalConnection;
 use App\Models\ExternalProduct;
 use App\Models\OrderItem;
@@ -30,9 +31,22 @@ class RaynaHelpers
         try {
 
             $extProduct = $item->product->externalProducts->where('external_connection_id', $externalConnection->id)->where('is_active', true)->first();
-            if (is_null($extProduct))
+            if (is_null($extProduct)) {
+                $comm1 = new Communication();
+                $comm1->action = "Rayna API booking request";
+                $comm1->description = "Error: missing 'external_product'";
+                $item->communications()->save($comm1);
                 return;
+            }
 
+            $additionalData = json_decode($extProduct->additional_data, true);
+            if (is_null($additionalData)) {
+                $comm1 = new Communication();
+                $comm1->action = "Rayna API booking request";
+                $comm1->description = "Error: missing 'additional_data'";
+
+                $item->communications()->save($comm1);
+            }
 
             $apiLog = new ApiLog();
             $apiLog->loggable()->associate($item);
