@@ -4,6 +4,8 @@ namespace App\Nova\Actions;
 
 use App\Helpers\FTPHelpers;
 use App\Helpers\RaynaHelpers;
+use App\Models\ExternalConnection;
+use App\Models\OrderItem;
 use App\Models\Product;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -31,21 +33,45 @@ class ProcessViaApi extends Action
      */
     public function handle(ActionFields $fields, Collection $models)
     {
-        $provider = $fields->provider;
-
         $user = Auth::user();
         if (is_null($user))
-            return ActionResponse::danger('User is null');
+            return ActionResponse::danger('User is not authorized');
+
+        if ($models->count() > 1)
+            return Action::danger('Please run this action on only one OrderItem resource.');
 
 
-        if ($provider == 3)
-            return ActionResponse::danger('Function not available.');
+        $provider = $fields->provider;
+
+        if (is_null($provider))
+            return Action::danger('Please select a provider.');
 
 
-        if ($provider == 2)
-            return RaynaHelpers::ProcessOrderItems($models, $user);
+        $orderItem = $models->first();
+        if (!isset($orderItem))
+            return Action::danger('OrderItem is null');
 
-        return ActionResponse::message('Function not available.');
+
+        $connectionType = null;
+        switch ($provider) {
+            default:
+                return ActionResponse::message('Function not available.');
+            case 2:
+                $connectionType = "rayna";
+        }
+
+        $externalConnection = ExternalConnection::where('connection_type', $connectionType)->where('is_active', true)->first();
+        if (!isset($externalConnection) || is_null($externalConnection))
+            return  ActionResponse::danger('ExternalConnection(' . $connectionType . ') is not available or inactive.');
+
+        $extProduct = $$orderItem->product->externalProducts->where('external_connection_id', $externalConnection->id)->where('is_active', true)->first();
+        if (is_null($extProduct)) {
+            return ActionResponse::danger("Error: missing 'external_product'");
+        }
+
+        $additionalData = json_decode($extProduct->additional_data, true);
+        if (is_null($additionalData))
+            return ActionResponse::danger("Error: missing 'additional_data'");
     }
 
     /**
