@@ -17,7 +17,7 @@ class ManualEmail extends Mailable
     /**
      * Create a new message instance.
      */
-    public function __construct($selectedFiles, $template, $subject, $fromName, $mailSettings)
+    public function __construct($template, $subject, $fromName, $mailSettings, $selectedFiles = null)
     {
         $this->selectedFiles = $selectedFiles;
         $this->subject = $subject;
@@ -30,12 +30,18 @@ class ManualEmail extends Mailable
     public function build()
     {
         \Log::info('TestEmail.Build()' . $this->template);
-        return $this->view('emails.test', ['content' => $this->template])
-            // ->with(['htmlContent' => $this->template])
-            ->attach($this->selectedFiles->getRealPath(), array(
+        $mail = $this->view('emails.test', ['content' => $this->template]);
+
+        if (!is_null($this->selectedFiles)) {
+            $mail->attach($this->selectedFiles->getRealPath(), array(
                 'as' => $this->selectedFiles->getClientOriginalName(),
                 'mime' => $this->selectedFiles->getMimeType()
             ));
+        }
+
+        return $mail;
+        // ->with(['htmlContent' => $this->template])
+
 
 
         // $mail = $this->view('emails.test')

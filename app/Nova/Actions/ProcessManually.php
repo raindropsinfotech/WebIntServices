@@ -2,6 +2,7 @@
 
 namespace App\Nova\Actions;
 
+use App\Helpers\EmailHelpers;
 use App\Mail\ManualEmail;
 use App\Models\Communication;
 use Auth;
@@ -93,36 +94,39 @@ class ProcessManually extends Action
         if (is_null($email))
             return Action::danger("Email not set on order(" . $order->ShopOrderNumber . ")");
 
-        try {
+        // try {
 
-            \Log::info('sending email...');
-            // Attempt to send the email
-            $subject = $template->Subject;
-            $subject = str_replace('{Order_Number}', $order->ShopOrderNumber, $subject);
-            $subject = str_replace('{Service}', $orderItem->product->FullName, $subject);
+        \Log::info('sending email...');
+        // Attempt to send the email
+        $subject = $template->Subject;
+        $subject = str_replace('{Order_Number}', $order->ShopOrderNumber, $subject);
+        $subject = str_replace('{Service}', $orderItem->product->FullName, $subject);
 
-            // replace placeholders in template
-            $content = $template->Content;
-            $content = str_replace('{Order_Number}', $order->ShopOrderNumber, $content);
-            $content = str_replace('{Service}', $orderItem->product->FullName, $content);
-            $content = str_replace('{Customer_First_Name}', $order->CustomerName, $content);
+        // replace placeholders in template
+        $content = $template->Content;
+        $content = str_replace('{Order_Number}', $order->ShopOrderNumber, $content);
+        $content = str_replace('{Service}', $orderItem->product->FullName, $content);
+        $content = str_replace('{Customer_First_Name}', $order->CustomerName, $content);
 
-            config([
-                'mail.driver' => 'smtp',
-                'mail.host' => $mailSettings->Host,
-                'mail.port' => $mailSettings->Port,
-                'mail.username' => $mailSettings->Username,
-                'mail.password' => $mailSettings->Password,
-                'mail.'
-            ]);
+        // config([
+        //     'mail.driver' => 'smtp',
+        //     'mail.host' => $mailSettings->Host,
+        //     'mail.port' => $mailSettings->Port,
+        //     'mail.username' => $mailSettings->Username,
+        //     'mail.password' => $mailSettings->Password,
+        // ]);
 
-            // \Log::info($content);
-            \Log::info('configuration set.');
+        // // \Log::info($content);
+        // \Log::info('configuration set.');
 
-            Mail::to($email)->send(new ManualEmail($fields->files, $content, $subject, $order->externalConnection->name, $mailSettings));
+        // Mail::to($email)->send(new ManualEmail($content, $subject, $order->externalConnection->name, $mailSettings, $fields->files));
 
-            // If no exception is thrown, the email was sent successfully
+        $emailSendResult = EmailHelpers::sendEmail($mailSettings, $subject, $content, $email, $order->externalConnection->name, $fields->files);
+
+        if ($emailSendResult[0] == true) {
             echo "Email sent successfully.";
+
+
 
             $comm = new Communication();
             $comm->action = "tickets sent";
@@ -139,14 +143,23 @@ class ProcessManually extends Action
 
             $orderItem->communications()->save($comm1);
 
+            return Action::message("Files sent to " . $email . ' successfully.');
+        } else {
 
-            return Action::message("Files sent to " . $orderItem->order->CustomerEmail . ' successfully.');
-        } catch (\Exception $e) {
-            // If an exception is caught, there was an error sending the email
-            echo "Error sending email: " . $e->getMessage();
-            \Log::error($e->getMessage());
-            return Action::danger("Error sending email: " . $e->getMessage());
+            \Log::error($emailSendResult[1]);
+            return Action::danger($emailSendResult[1]);
         }
+        // If no exception is thrown, the email was sent successfully
+
+
+
+
+        // } catch (\Exception $e) {
+        //     // If an exception is caught, there was an error sending the email
+        //     echo "Error sending email: " . $e->getMessage();
+        //     \Log::error($e->getMessage());
+        //     return Action::danger("Error sending email: " . $e->getMessage());
+        // }
     }
 
     /**
