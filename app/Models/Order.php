@@ -94,4 +94,13 @@ class Order extends Model implements Auditable
     {
         return $this->morphMany(Communication::class, 'communicable');
     }
+
+    public function addCommunication($action, $description)
+    {
+        $comm = new Communication();
+        $comm->action = $action;
+        $comm->description = $description;
+
+        $this->communications()->save($comm);
+    }
 }

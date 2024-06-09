@@ -107,7 +107,9 @@ class Order extends Resource
             Date::make('Order Time', 'OrderDateTime')
                 ->default(Carbon::today()),
             HasMany::make('Audits', 'audits', Audit::class),
-            Text::make('PaymentReference', 'PaymentReference')->readonly(),
+            Text::make('PaymentReference', 'PaymentReference')->readonly(function ($request) {
+                return !auth()->user()->hasRole('admin');
+            }),
             MorphMany::make('Communications'),
             DateTime::make('Created at', 'CreatedAt')->readonly()->onlyOnDetail(),
             DateTime::make('Updated at', 'UpdatedAt')->readonly()->onlyOnDetail(),

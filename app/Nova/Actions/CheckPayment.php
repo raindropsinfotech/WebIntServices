@@ -2,6 +2,7 @@
 
 namespace App\Nova\Actions;
 
+use App\Models\Order;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
@@ -115,7 +116,7 @@ class CheckPayment extends Action
         return false;
     }
 
-    public function checkPaymentByChargeId($stripe, $paymentReference, $order): bool
+    public function checkPaymentByChargeId($stripe, $paymentReference, Order $order): bool
     {
         \Log::alert('checking stripe charge ' . $paymentReference);
         $ch = $stripe->charges->retrieve($paymentReference);
@@ -124,50 +125,86 @@ class CheckPayment extends Action
 
         \Log::info($ch);
 
-        \Log::info('OrderTotal = ' . $order->OrderTotal * 100);
-        if ($order->OrderTotal * 100 == $ch->amount_captured) {
-            \Log::info('Amount confirmed');
-        }
-
-        if ($ch->status === "succeeded") {
-            \Log::info('status confirmed');
-        }
-
-        if (!is_null($ch->payment_method_details->card->three_d_secure)) {
-            \Log::info('three_d_secure segment available.');
-        }
-
-        if (!is_null($ch->payment_method_details->card->three_d_secure)) {
-            \Log::info('result  = ' . $ch->payment_method_details->card->three_d_secure->result);
-        }
-        if (!(($order->OrderTotal * 100 == $ch->amount_captured)
-            && $ch->status === "succeeded"
-            && !is_null($ch->payment_method_details)
-            && !is_null($ch->payment_method_details->card)
-        )) {
-
+        if ($ch->status != "succeeded" && $ch->paid != true) {
+            \Log::info('status: ' . $ch->status);
+            \Log::info('paid: ' . $ch->paid);
+            $order->addCommunication("CheckPayment", "Unable to verify. status : " . $ch->status . ", paid : " . $ch->paid);
             return false;
         }
 
-        // if apple_pay payment
-        if (!is_null($ch->payment_method_details->card->wallet) &&  $ch->payment_method_details->card->wallet->type == "apple_pay") {
-            $order->PaymentStatus = 2;
-            $order->save();
-
-            return true;
+        \Log::info('OrderTotal = ' . $order->OrderTotal * 100);
+        $orderTotal = $order->OrderTotal * 100;
+        \Log::info('Order total: ' . $orderTotal);
+        \Log::info('Amount captured: ' . $ch->amount_captured);
+        if (round($orderTotal, 2) != round($ch->amount_captured, 2)) {
+            \Log::info('Order total (' . $orderTotal . ') and amount captured (' . $ch->amount_captured . ') are not equal.');
+            $order->addCommunication("CheckPayment", 'Order total (' . $orderTotal . ') and amount captured (' . $ch->amount_captured . ') are not equal.');
+            return false; // if order total and amount captured is not equal then we need to check and change manually.
         }
+        // if ($orderTotal != $ch->amount_captured) {
+        //     \Log::info('Order total (' . $orderTotal . ') and amount captured (' . $ch->amount_captured . ')is not equal.');
+        //     return false; // if order total and amount captured is not equal then we need to check and change manually.
+        // }
+
+        if (is_null($ch->payment_method_details->card->three_d_secure)) {
+
+            // we check for wallet payments and return if not succeeded
+            if (is_null($ch->payment_method_details->card->wallet)) {
+                \Log::info('three_d_secure and wallet is NULL.');
+                $order->addCommunication("CheckPayment", 'three_d_secure and wallet is NULL.');
+                return false;
+            }
+        } else {
+            if (is_null($ch->payment_method_details->card->three_d_secure->result)) {
+                \Log::info('three_d_secure result not available . ');
+                $order->addCommunication("CheckPayment", 'three_d_secure result not available .');
+                return false;
+            }
+
+            if ($ch->payment_method_details->card->three_d_secure->result != "authenticated") {
+                \Log::info('three_d_secure result = ' . $ch->payment_method_details->card->three_d_secure->result);
+                $order->addCommunication("CheckPayment", 'three_d_secure result = ' . $ch->payment_method_details->card->three_d_secure->result);
+                return false;
+            }
+        }
+
+        $order->PaymentStatus = 2;
+        $order->save();
+        $order->addCommunication("CheckPayment", 'Payment checked and status updated to paid.');
+        return true;
+
+        // need to check if payment is via wallet or card
+
+        // if apple_pay payment
+        // if (!is_null($ch->payment_method_details->card->wallet) &&  $ch->payment_method_details->card->wallet->type == "apple_pay") {
+        //     $order->PaymentStatus = 2;
+        //     $order->save();
+
+        //     return true;
+        // }
+
+        // if (!(($order->OrderTotal * 100 == $ch->amount_captured)
+        //     && $ch->status === "succeeded"
+        //     && !is_null($ch->payment_method_details)
+        //     && !is_null($ch->payment_method_details->card)
+        // )) {
+
+        //     return false;
+        // }
+
+
 
         // if 3d_secure_card payment
-        if (
-            !is_null($ch->payment_method_details->card->three_d_secure)
-            &&  $ch->payment_method_details->card->three_d_secure->result == "authenticated"
-        ) {
-            $order->PaymentStatus = 2;
-            $order->save();
+        // if (
+        //     !is_null($ch->payment_method_details->card->three_d_secure)
+        //     &&  $ch->payment_method_details->card->three_d_secure->result == "authenticated"
+        // ) {
+        //     $order->PaymentStatus = 2;
+        //     $order->save();
 
-            return true;
-        }
+        //     return true;
+        // }
 
-        return false;
+        // return false;
     }
 }
