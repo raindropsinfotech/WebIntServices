@@ -92,7 +92,7 @@ class Order extends Resource
                 ])->default(0)
 
                 ->filterable(),
-            Number::make('Order Total', 'OrderTotal'),
+            Number::make('Order Total', 'OrderTotal')->step('any'),
             Select::make('Payment Status', 'PaymentStatus')
                 ->options([
                     0 => 'Unpaid',
