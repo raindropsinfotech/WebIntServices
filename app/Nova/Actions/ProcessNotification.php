@@ -88,8 +88,15 @@ class ProcessNotification extends Action
             return;
         }
 
-        $customerName =  $payloadArray->customer->firstName . ' ' . $payloadArray->customer->firstName;
-        $payment_reference = $payloadArray?->customerPayments[0]?->authorizationCode;
+        $customerName =  $payloadArray->customer->firstName . ' ' . $payloadArray->customer->lastName;
+        $payment_reference = null;
+        if ($payloadArray->bookingChannel->type == "OTA" && $payloadArray->bookingChannel->title == "Viator.com") {
+            // booking is from viator
+            $payment_reference = $payloadArray?->customerPayments[0]?->activeCustomerInvoiceId;
+        } else {
+            // booking is from Bokun
+            $payment_reference = $payloadArray?->customerPayments[0]?->authorizationCode;
+        }
         $order = $this->GetOrder($external_connection->id, $payloadArray->confirmationCode, $payloadArray->totalPaid, date("Y-m-d H:i:s", $payloadArray->creationDate / 1000), $payloadArray->customer->email, $customerName, $payloadArray->customer->phoneNumber, $payment_reference);
 
         if (!isset($order)) {
