@@ -56,7 +56,8 @@ class Credential extends Resource
                 4 => 'Stripe',
                 5 => 'Razorpay',
                 6 => 'Twilio',
-                7 => 'CurrencyConverter'
+                7 => 'CurrencyConverter',
+                8 => 'Woo'
             ])->displayUsingLabels()->filterable(),
             Boolean::make('active', 'Active'),
             Text::make('baseUrl', 'BaseUrl'),

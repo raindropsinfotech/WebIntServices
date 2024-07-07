@@ -2,7 +2,7 @@
 
 namespace App\Nova\Actions;
 
-use App\Events\OrderCreatedEvent;
+
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Collection;
@@ -28,15 +28,8 @@ class ProcessNotification extends Action
         $totalNotification = count($models);
         $processedNotifications = 0;
         foreach ($models as $notification) {
-            if ($notification->source === 'bokun') {
-                // process bokun notification
-                $this->processBokunNotification($notification);
-            }
 
-            if ($notification->source == 'ecwid') {
-                // process ecwid notification
-                $this->processEcwidNotification($notification);
-            }
+            $this->processNotification($notification);
 
             $processedNotifications++;
         }
@@ -53,6 +46,23 @@ class ProcessNotification extends Action
     public function fields(NovaRequest $request)
     {
         return [];
+    }
+
+    public function processNotification(\APP\Models\Notification $notification)
+    {
+        if ($notification->source === 'bokun') {
+            // process bokun notification
+            $this->processBokunNotification($notification);
+        }
+
+        if ($notification->source == 'ecwid') {
+            // process ecwid notification
+            $this->processEcwidNotification($notification);
+        }
+        if ($notification->source == 'woo') {
+            // process ecwid notification
+            \App\Helpers\WooHelpers::processWooNotification($notification);
+        }
     }
 
     public function processBokunNotification(\APP\Models\Notification $notification)
@@ -97,7 +107,7 @@ class ProcessNotification extends Action
             // booking is from Bokun
             $payment_reference = $payloadArray?->customerPayments[0]?->authorizationCode;
         }
-        $order = $this->GetOrder($external_connection->id, $payloadArray->confirmationCode, $payloadArray->totalPaid, date("Y-m-d H:i:s", $payloadArray->creationDate / 1000), $payloadArray->customer->email, $customerName, $payloadArray->customer->phoneNumber, $payment_reference);
+        $order = \App\Helpers\OrderHelpers::GetOrder($external_connection->id, $payloadArray->confirmationCode, $payloadArray->totalPaid, date("Y-m-d H:i:s", $payloadArray->creationDate / 1000), $payloadArray->customer->email, $customerName, $payloadArray->customer->phoneNumber, $payment_reference);
 
         if (!isset($order)) {
             $notification->status = 'processed_error';
@@ -229,7 +239,7 @@ class ProcessNotification extends Action
 
         $ecwidResponse = json_decode($ecwidResponseData);
 
-        $order = $this->getOrder($external_connection->id, $ecwidResponse->id, $ecwidResponse->total, date("y-m-d h:i:s", $ecwidResponse->createTimestamp), $ecwidResponse->email, $ecwidResponse->billingPerson->name, $ecwidResponse->billingPerson->phone, isset($ecwidResponse->externalTransactionId) ? $ecwidResponse->externalTransactionId : null);
+        $order = \App\Helpers\OrderHelpers::getOrder($external_connection->id, $ecwidResponse->id, $ecwidResponse->total, date("y-m-d h:i:s", $ecwidResponse->createTimestamp), $ecwidResponse->email, $ecwidResponse->billingPerson->name, $ecwidResponse->billingPerson->phone, isset($ecwidResponse->externalTransactionId) ? $ecwidResponse->externalTransactionId : null);
         if (!isset($order)) {
             $notification->status = 'processed_error';
             $notification->result = 'Unable to create order.';
@@ -292,6 +302,8 @@ class ProcessNotification extends Action
         $notification->save();
     }
 
+
+
     private function getDateFromTimestamp($timestamp)
     {
 
@@ -320,54 +332,5 @@ class ProcessNotification extends Action
 
 
         return $response->getBody();
-    }
-
-    private function getOrder($external_connection_id, $shopOrderNumber,  $orderTotal, $orderDate, $customerEmail, $customerName, $customerPhone, $payment_reference)
-    {
-        // first check order number
-        // if external connection is not attached then attach external connection.
-        $order = \App\Models\Order::where('ShopOrderNumber', $shopOrderNumber)->first();
-        $is_new = false;
-        // ->where('external_connection_id', $external_connection_id)->first();
-        if ($order == null) {
-            $order = new \App\Models\Order();
-            $is_new = true;
-        }
-
-        $order->CustomerName = $customerName;
-        $order->CustomerEmail = $customerEmail;
-        // $order->CustomerPhone = $payloadArray->customer->phoneNumber;
-        $order->ShopOrderNumber = $shopOrderNumber;
-        $order->OrderDateTime = $orderDate; //$this->getDateFromTimestamp($payloadArray->creationDate);
-        $order->OrderTotal = $orderTotal;
-        $order->external_connection_id = $external_connection_id;
-        $order->PaymentReference = $payment_reference;
-        $order->save();
-
-        if ($is_new)
-            event(new OrderCreatedEvent($order));
-
-        return $order;
-    }
-
-    private function addOrdeItem($orderId, $productId, $shopOrderItemRference,  $serviceDate, $adultsCount, $childCount = 0)
-    {
-        $orderitem = \App\Models\OrderItem::where('OrderId', $orderId)
-            ->where('ProductId', $productId)
-            ->where('ExrenalId', $shopOrderItemRference)
-            ->first();
-
-        if ($orderitem == null)
-            $orderitem = new \app\models\orderitem();
-
-        $orderitem->ProductId = $productId;
-        $orderitem->servicedatetime = $serviceDate;
-        $orderitem->Adults = $adultsCount;
-        $orderitem->Children = $childCount;
-
-        $orderitem->ExrenalId = $shopOrderItemRference;
-        $orderitem->OrderId = $orderId;
-
-        $orderitem->save();
     }
 }

@@ -51,7 +51,7 @@ class ExternalConnection extends Resource
         return [
             ID::make()->sortable(),
             Text::make('name'),
-            Select::make('connection_type')->options(['ecwid' => 'ecwid', 'bokun' => 'bokun', 'rayna' => 'rayna']),
+            Select::make('connection_type')->options(['ecwid' => 'ecwid', 'bokun' => 'bokun', 'rayna' => 'rayna', 'woo' => 'woo']),
             Text::make('external_id'),
             Boolean::make('is_active'),
             DateTime::make('updated_at')->readonly()

@@ -25,12 +25,12 @@ class ProcessNotificationListener
         $notification = $event->notification;
 
         $notificationProcessor = new ProcessNotification();
-
-        if ($notification->source == "bokun") {
-            $notificationProcessor->processBokunNotification($notification);
-        }
-        if ($notification->source == "ecwid") {
-            $notificationProcessor->processEcwidNotification($notification);
-        }
+        $notificationProcessor->processNotification($notification);
+        // if ($notification->source == "bokun") {
+        //     $notificationProcessor->processBokunNotification($notification);
+        // }
+        // if ($notification->source == "ecwid") {
+        //     $notificationProcessor->processEcwidNotification($notification);
+        // }
     }
 }

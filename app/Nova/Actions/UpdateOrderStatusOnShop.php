@@ -53,6 +53,7 @@ class UpdateOrderStatusOnShop extends Action
             Select::make('status')->options([
                 'AWAITING_PROCESSING' => 'AWAITING_PROCESSING',
                 'PROCESSING' => 'PROCESSING',
+                'CUSTOM_FULFILLMENT_STATUS_1' => 'CONFIRMED',
                 'DELIVERED' => 'DELIVERED',
                 'OUT_FOR_DELIVERY' => 'OUT_FOR_DELIVERY',
                 'WILL_NOT_DELIVER' => 'WILL_NOT_DELIVER',

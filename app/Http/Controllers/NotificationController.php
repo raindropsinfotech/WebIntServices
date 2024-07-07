@@ -41,7 +41,7 @@ class NotificationController extends Controller
 
             event(new NotificationStored($notification)); // to raise an event on notificationstored. The system will try to process the notification.
 
-            if ($request->input('source') == 'ecwid')
+            if ($request->input('source') == 'ecwid' || $request->input('source') == 'woo')
                 return response(null, 200);
 
             return response()->json(['message' => 'Data saved successfully'], 201);
