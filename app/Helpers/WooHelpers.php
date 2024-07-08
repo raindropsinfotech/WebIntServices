@@ -129,8 +129,8 @@ class WooHelpers
             foreach ($products as $product) {
 
                 $serviceDate = date("y-m-d h:i:s", strtotime('+2 days'));
-                if (isset($item) && isset($item->meta)) {
-                    $dateElement = array_filter($item->meta, function ($obj) {
+                if (isset($item) && isset($item->meta_data)) {
+                    $dateElement = array_filter($item->meta_data, function ($obj) {
                         return $obj->key == 'Tour Date';
                     });
                 }

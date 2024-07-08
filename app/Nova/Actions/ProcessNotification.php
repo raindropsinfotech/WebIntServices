@@ -152,7 +152,7 @@ class ProcessNotification extends Action
 
             foreach ($products as $product) {
 
-                $this->addOrdeItem($order->Id, $product->Id, $activityBooking->barcode->value, date("y-m-d h:i:s", $activityBooking->date / 1000), $activityBooking->totalParticipants);
+                \App\Helpers\OrderHelpers::addOrdeItem($order->Id, $product->Id, $activityBooking->barcode->value, date("y-m-d h:i:s", $activityBooking->date / 1000), $activityBooking->totalParticipants);
             }
         }
         $notification->status = 'processed_ok';
@@ -291,7 +291,7 @@ class ProcessNotification extends Action
                     $serviceDate = date("y-m-d h:i:s", strtotime(head($dateElement)->value));
                 }
 
-                $this->addOrdeItem($order->Id, $product->Id, $item->id, $serviceDate, $item->quantity);
+                \App\Helpers\OrderHelpers::addOrdeItem($order->Id, $product->Id, $item->id, $serviceDate, $item->quantity);
             }
         }
 
