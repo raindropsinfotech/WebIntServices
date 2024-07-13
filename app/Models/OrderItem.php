@@ -65,4 +65,34 @@ class OrderItem extends Model implements Auditable
     {
         return $this->morphMany(Communication::class, 'communicable');
     }
+
+    // Define a mutator for IsProcessed attribute
+    public function setIsProcessedAttribute($value)
+    {
+        $this->attributes['IsProcessed'] = $value;
+
+        // Automatically update OrderItemStatus based on conditions
+        $this->updateOrderItemStatus();
+    }
+
+    // Define a mutator for PostpondDelivery attribute
+    public function setPostpondDeliveryAttribute($value)
+    {
+        $this->attributes['PostpondDelivery'] = $value;
+
+        // Automatically update OrderItemStatus based on conditions
+        $this->updateOrderItemStatus();
+    }
+
+    // Method to update OrderItemStatus attribute based on conditions
+    protected function updateOrderItemStatus()
+    {
+        if ($this->IsProcessed) {
+            $this->OrderItemStatus = 2;
+        } elseif (!$this->IsProcessed && $this->PostpondDelivery) {
+            $this->OrderItemStatus = 3;
+        } else {
+            $this->OrderItemStatus = 1;
+        }
+    }
 }

@@ -15,6 +15,7 @@
         "laravel/sanctum": "^3.3",
         "laravel/tinker": "^2.8",
         "owen-it/laravel-auditing": "^13.6",
+        "spatie/laravel-enum": "^3.1",
         "spatie/laravel-permission": "^6.3",
         "stripe/stripe-php": "^13.15"
     },

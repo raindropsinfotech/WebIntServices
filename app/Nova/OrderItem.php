@@ -4,8 +4,8 @@ namespace App\Nova;
 
 use App\Nova\Actions\ProcessManually;
 use App\Nova\Actions\ProcessNow;
-use App\Nova\Filters\OrderItemStatus;
 use Illuminate\Http\Request;
+use Laravel\Nova\Fields\Badge;
 use Laravel\Nova\Fields\Boolean;
 use Laravel\Nova\Fields\ID;
 use Laravel\Nova\Fields\Text;
@@ -14,11 +14,12 @@ use Laravel\Nova\Fields\BelongsTo;
 use Laravel\Nova\Fields\Date;
 use Laravel\Nova\Fields\HasMany;
 use Laravel\Nova\Fields\MorphMany;
-use Laravel\Nova\Fields\MorphToMany;
 use Laravel\Nova\Fields\Number as FieldsNumber;
 use Laravel\Nova\Fields\Select;
 use Laravel\Nova\Http\Requests\NovaRequest;
-use Number;
+
+
+
 
 class OrderItem extends Resource
 {
@@ -74,6 +75,20 @@ class OrderItem extends Resource
     {
         return [
             ID::make('id', 'Id')->sortable(),
+            Badge::make('OrderItemStatus', 'OrderItemStatus')->map([
+                0 => 'danger',
+                1 => 'danger',
+                2 => 'success',
+                3 => 'info',
+
+            ])
+                ->labels([
+                    0 => 'UNDEFINED',
+                    1 => 'Pending',
+                    2 => 'Processed',
+                    3 => 'Cancelled',
+                ])
+                ->filterable(),
             Boolean::make('Processed', 'IsProcessed')->filterable()->readonly(),
             BelongsTo::make('Order', 'order', Order::class)->display('ShopOrderNumber')->readonly(),
             Text::make('External Id', 'ExrenalId')->hideFromIndex(),
