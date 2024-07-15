@@ -4,6 +4,8 @@ namespace App\Nova;
 
 use App\Nova\Actions\ProcessManually;
 use App\Nova\Actions\ProcessNow;
+use App\Nova\Actions\ProcessViaApi;
+use App\Nova\Filters\OrderItemStatus;
 use Illuminate\Http\Request;
 use Laravel\Nova\Fields\Badge;
 use Laravel\Nova\Fields\Boolean;
@@ -114,6 +116,7 @@ class OrderItem extends Resource
                 }),
             HasMany::make('Audits', 'audits', Audit::class),
             MorphMany::make('Communications'),
+            MorphMany::make('Api logs', 'loggable', ApiLog::class),
         ];
     }
 
@@ -163,6 +166,7 @@ class OrderItem extends Resource
         return [
             ProcessNow::make(),
             ProcessManually::make(),
+            ProcessViaApi::make(),
         ];
     }
 
