@@ -68,7 +68,6 @@ class Product extends Model implements Auditable
 
 
     public static $orderProcessingTypes = [
-        2 => 'Rayna',
-        3 => 'Rathin'
+        'rayna' => 'Rayna',
     ];
 }
